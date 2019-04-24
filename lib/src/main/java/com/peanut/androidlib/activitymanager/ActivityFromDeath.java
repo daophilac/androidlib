@@ -11,9 +11,6 @@ public class ActivityFromDeath extends SoulSummoner {
     private ActivityFromDeathListener activityFromDeathListener;
     private boolean started;
     private boolean stopped;
-    public interface ActivityFromDeathListener {
-        HashMap<String, Bundle> buildBundle();
-    }
     public ActivityFromDeath(){}
     public ActivityFromDeath(Activity activity){
         this.activity = activity;
@@ -26,36 +23,38 @@ public class ActivityFromDeath extends SoulSummoner {
         if(!this.started || this.stopped){
             return;
         }
+        this.activity.finish();
         HashMap<String, Bundle> mapBundleActivity = this.activityFromDeathListener.buildBundle();
         setMapBundleActivity(mapBundleActivity);
-        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
-        intent.setAction(ActivitySignal.ON_STOP);
-        activity.sendOrderedBroadcast(intent, null);
+        Intent intent = new Intent(this.activity, ActivityFromDeath.class);
+        intent.setAction(SoulSummoner.ActivitySignal.ON_STOP);
+        this.activity.sendOrderedBroadcast(intent, null);
     }
-    public void sendOnDestroySignal(){
-        if(!this.started || this.stopped){
-            return;
-        }
-        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
-        intent.setAction(SoulSummoner.ActivitySignal.ON_DESTROY);
-        activity.sendOrderedBroadcast(intent, null);
-    }
+    //    public void sendOnDestroySignal(){
+//        if(!this.started || this.stopped){
+//            return;
+//        }
+//        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
+//        intent.setAction(SoulSummoner.ActivitySignal.ON_DESTROY);
+//        activity.sendOrderedBroadcast(intent, null);
+//    }
     public void sendOnResumeSignal(){
         if(!this.started || this.stopped){
             return;
         }
-        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
+        this.activityFromDeathListener.getBundle();
+        Intent intent = new Intent(activity, ActivityFromDeath.class);
         intent.setAction(SoulSummoner.ActivitySignal.ON_RESUME);
         activity.sendOrderedBroadcast(intent, null);
     }
-    public void sendOnCreateSignal(){
-        if(!this.started || this.stopped){
-            return;
-        }
-        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
-        intent.setAction(SoulSummoner.ActivitySignal.ON_CREATE);
-        activity.sendOrderedBroadcast(intent, null);
-    }
+    //    public void sendOnCreateSignal(){
+////        if(!this.started || this.stopped){
+////            return;
+////        }
+////        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
+////        intent.setAction(SoulSummoner.ActivitySignal.ON_CREATE);
+////        activity.sendOrderedBroadcast(intent, null);
+////    }
     public void start(){
         this.started = true;
     }
@@ -63,5 +62,9 @@ public class ActivityFromDeath extends SoulSummoner {
         this.stopped = true;
         this.activity = null;
         this.activityFromDeathListener = null;
+    }
+    public interface ActivityFromDeathListener {
+        HashMap<String, Bundle> buildBundle();
+        void getBundle();
     }
 }
