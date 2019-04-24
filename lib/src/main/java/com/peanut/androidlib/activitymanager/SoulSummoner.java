@@ -84,7 +84,7 @@ class SoulSummoner extends BroadcastReceiver {
         }
     }
 
-    public class Incantation implements Runnable, SoulSummonerListener {
+    private class Incantation implements Runnable, SoulSummonerListener {
         @Override
         public void onStop() {
             this.stop = true;
@@ -109,7 +109,7 @@ class SoulSummoner extends BroadcastReceiver {
             }
         }
     }
-    public interface SoulSummonerListener {
+    private interface SoulSummonerListener {
         void onStop();
     }
     private enum State{

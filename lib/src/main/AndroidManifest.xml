@@ -1,2 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peanut.androidlib" />
+    package="com.peanut.androidlib" >
+    <application>
+        <receiver android:name=".activitymanager.ActivityFromDeath"/>
+    </application>
+</manifest>
