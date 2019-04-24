@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.peanut.androidlib" >
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
     <application>
         <receiver android:name=".activitymanager.ActivityFromDeath"/>
     </application>
