@@ -8,18 +8,18 @@ import java.util.HashMap;
 
 public class ActivityFromDeath extends SoulSummoner {
     private Activity activity;
-    private ActivityListenerFromDeathListener activityListenerFromDeathListener;
-    public interface ActivityListenerFromDeathListener{
+    private ActivityFromDeathListener activityFromDeathListener;
+    public interface ActivityFromDeathListener {
         HashMap<String, Bundle> buildBundle();
     }
     public ActivityFromDeath(){}
     public ActivityFromDeath(Activity activity){
         this.activity = activity;
-        this.activityListenerFromDeathListener = (ActivityListenerFromDeathListener) activity;
+        this.activityFromDeathListener = (ActivityFromDeathListener) activity;
         SoulSummoner.setActivityClass(activity.getClass());
     }
     public void sendOnStopSignal(){
-        HashMap<String, Bundle> mapBundleActivity = this.activityListenerFromDeathListener.buildBundle();
+        HashMap<String, Bundle> mapBundleActivity = this.activityFromDeathListener.buildBundle();
         SoulSummoner.setMapBundleActivity(mapBundleActivity);
         Intent intent = new Intent(activity, ActivityFromDeath.class);
         intent.setAction(ActivitySignal.ON_STOP);
