@@ -30,14 +30,6 @@ public class ActivityFromDeath extends SoulSummoner {
         intent.setAction(SoulSummoner.ActivitySignal.ON_STOP);
         this.activity.sendOrderedBroadcast(intent, null);
     }
-    //    public void sendOnDestroySignal(){
-//        if(!this.started || this.stopped){
-//            return;
-//        }
-//        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
-//        intent.setAction(SoulSummoner.ActivitySignal.ON_DESTROY);
-//        activity.sendOrderedBroadcast(intent, null);
-//    }
     public void sendOnResumeSignal(){
         if(!this.started || this.stopped){
             return;
@@ -47,14 +39,6 @@ public class ActivityFromDeath extends SoulSummoner {
         intent.setAction(SoulSummoner.ActivitySignal.ON_RESUME);
         activity.sendOrderedBroadcast(intent, null);
     }
-    //    public void sendOnCreateSignal(){
-////        if(!this.started || this.stopped){
-////            return;
-////        }
-////        Intent intent = new Intent(activity, com.peanut.androidlib.activitymanager.ActivityFromDeath.class);
-////        intent.setAction(SoulSummoner.ActivitySignal.ON_CREATE);
-////        activity.sendOrderedBroadcast(intent, null);
-////    }
     public void start(){
         this.started = true;
     }
