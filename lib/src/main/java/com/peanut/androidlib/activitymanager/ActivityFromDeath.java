@@ -18,6 +18,8 @@ public class ActivityFromDeath extends SoulSummoner {
     public ActivityFromDeath(Activity activity){
         this.activity = activity;
         this.activityFromDeathListener = (ActivityFromDeathListener) activity;
+        this.started = false;
+        this.stopped = false;
         SoulSummoner.setActivityClass(activity.getClass());
     }
     public void sendOnStopSignal(){
