@@ -1,9 +1,9 @@
-package com.peanut.androidlib.viewmanager;
+package com.peanut.androidlib.worker.viewmanager;
 
 import android.os.Handler;
 import android.os.Looper;
 
-public abstract class ViewListenerRegister extends Thread {
+public abstract class ViewDecorator extends Thread{
     @Override
     public void run() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {

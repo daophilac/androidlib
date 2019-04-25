@@ -1,4 +1,4 @@
-package com.peanut.androidlib.viewmanager;
+package com.peanut.androidlib.worker.viewmanager;
 
 public abstract class ViewFinder extends Thread {
     @Override
