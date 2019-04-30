@@ -54,6 +54,9 @@ public class ExecutionTimeTracker {
     }
 
     public long getAfterMillisecond() {
+        if(!this.started){
+            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+        }
         if(!this.stopped){
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
