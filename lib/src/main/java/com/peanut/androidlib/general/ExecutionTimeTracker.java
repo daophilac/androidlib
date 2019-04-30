@@ -12,10 +12,12 @@ public class ExecutionTimeTracker {
     private boolean started;
     private boolean stopped;
     private boolean running;
+    private boolean canGetTime;
     public ExecutionTimeTracker(){
         this.started = false;
         this.stopped = true;
         this.running = false;
+        this.canGetTime = false;
     }
     public void startTracking(){
         if(this.started){
@@ -28,6 +30,7 @@ public class ExecutionTimeTracker {
         this.started = true;
         this.stopped = false;
         this.running = true;
+        this.canGetTime = false;
     }
     public void stopTracking(){
         if(!this.started){
@@ -40,31 +43,38 @@ public class ExecutionTimeTracker {
         this.started = false;
         this.stopped = true;
         this.running = false;
+        this.canGetTime = true;
     }
 
     public long getBeforeMillisecond() {
-        if(!this.started){
-            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+        if(!this.canGetTime){
+            if(!this.started){
+                throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+            }
         }
         return this.beforeMillisecond;
     }
 
     public long getAfterMillisecond() {
-        if(!this.started){
-            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
-        }
-        if(!this.stopped){
-            throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
+        if(!this.canGetTime){
+            if(!this.started){
+                throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+            }
+            if(!this.stopped){
+                throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
+            }
         }
         return this.afterMillisecond;
     }
 
     public long getExecutionTime(){
-        if(!this.started){
-            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
-        }
-        if(!this.stopped){
-            throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
+        if(!this.canGetTime){
+            if(!this.started){
+                throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+            }
+            if(!this.stopped){
+                throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
+            }
         }
         return this.afterMillisecond - this.beforeMillisecond;
     }
