@@ -57,9 +57,6 @@ public class ExecutionTimeTracker {
     }
 
     public long getExecutionTime(){
-        if(!this.started){
-            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
-        }
         if(!this.stopped){
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
