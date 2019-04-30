@@ -11,16 +11,23 @@ public class ExecutionTimeTracker {
     private long afterMillisecond;
     private boolean started;
     private boolean stopped;
+    private boolean running;
+    public ExecutionTimeTracker(){
+        this.started = false;
+        this.stopped = true;
+        this.running = false;
+    }
     public void startTracking(){
         if(this.started){
             throw new IllegalStateException(ALREADY_STARTED);
         }
-        if(!this.stopped){
+        if(this.running && !this.stopped){
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
         this.beforeMillisecond = Calendar.getInstance().getTimeInMillis();
         this.started = true;
         this.stopped = false;
+        this.running = true;
     }
     public void stopTracking(){
         if(!this.started){
@@ -29,9 +36,10 @@ public class ExecutionTimeTracker {
         if(this.stopped){
             throw new IllegalStateException(ALREADY_STOPPED);
         }
+        this.afterMillisecond = Calendar.getInstance().getTimeInMillis();
         this.started = false;
         this.stopped = true;
-        this.afterMillisecond = Calendar.getInstance().getTimeInMillis();
+        this.running = false;
     }
 
     public long getBeforeMillisecond() {
@@ -49,6 +57,9 @@ public class ExecutionTimeTracker {
     }
 
     public long getExecutionTime(){
+        if(!this.started){
+            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+        }
         if(!this.stopped){
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
