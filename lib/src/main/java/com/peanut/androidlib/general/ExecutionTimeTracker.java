@@ -12,12 +12,10 @@ public class ExecutionTimeTracker {
     private boolean started;
     private boolean stopped;
     private boolean running;
-    private boolean canGetExecuteionTime;
     public ExecutionTimeTracker(){
         this.started = false;
         this.stopped = true;
         this.running = false;
-        this.canGetExecuteionTime = false;
     }
     public void startTracking(){
         if(this.started){
@@ -30,7 +28,6 @@ public class ExecutionTimeTracker {
         this.started = true;
         this.stopped = false;
         this.running = true;
-        this.canGetExecuteionTime = false;
     }
     public void stopTracking(){
         if(!this.started){
@@ -43,7 +40,6 @@ public class ExecutionTimeTracker {
         this.started = false;
         this.stopped = true;
         this.running = false;
-        this.canGetExecuteionTime = true;
     }
 
     public long getBeforeMillisecond() {
@@ -64,7 +60,10 @@ public class ExecutionTimeTracker {
     }
 
     public long getExecutionTime(){
-        if(!this.canGetExecuteionTime){
+        if(!this.started){
+            throw new IllegalStateException(HAVE_NOT_STARTED_YET);
+        }
+        if(!this.stopped){
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
         return this.afterMillisecond - this.beforeMillisecond;
