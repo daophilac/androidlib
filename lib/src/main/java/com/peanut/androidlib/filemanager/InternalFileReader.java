@@ -21,19 +21,20 @@ public class InternalFileReader {
     private FileInputStream fileInputStream;
     private InputStreamReader inputStreamReader;
     private BufferedReader bufferedReader;
-    public InternalFileReader(String fileName, Context context){
+    public InternalFileReader(Context context, String fileName){
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
-        this.fileName = fileName;
         this.context = context;
+        this.fileName = fileName;
         this.fullPath = this.context.getFilesDir() + "/" + this.fileName;
         this.useBaseDirectory = true;
     }
-    public InternalFileReader(String directoryContainer, String fileName, Context context){
+    public InternalFileReader(Context context, String directoryContainer, String fileName){
         if(context == null){
             throw new IllegalArgumentException("Activity cannot be null.");
         }
+        this.context = context;
         this.fileName = fileName;
         if(directoryContainer.charAt(0) == '/'){
             if(directoryContainer.charAt(directoryContainer.length() - 1) == '/'){
@@ -51,7 +52,6 @@ public class InternalFileReader {
                 this.directoryContainer = directoryContainer;
             }
         }
-        this.context = context;
         this.fullPath = this.context.getFilesDir() + "/" + this.directoryContainer + "/" + this.fileName;
         this.useBaseDirectory = false;
     }

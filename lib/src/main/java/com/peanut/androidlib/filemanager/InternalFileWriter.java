@@ -21,7 +21,7 @@ public class InternalFileWriter {
     private boolean useBaseDirectory;
 
     private PermissionInquirer permissionInquirer;
-    public InternalFileWriter(String fileName, Context context){
+    public InternalFileWriter(Context context, String fileName){
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
@@ -29,12 +29,12 @@ public class InternalFileWriter {
         if(!this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
             throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
         }
-        this.fileName = fileName;
         this.context = context;
+        this.fileName = fileName;
         this.fullPath = this.context.getFilesDir().getAbsolutePath() + "/" + this.fileName;
         this.useBaseDirectory = true;
     }
-    public InternalFileWriter(String directoryContainer, String fileName, Context context){
+    public InternalFileWriter(Context context, String directoryContainer, String fileName){
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
