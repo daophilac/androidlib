@@ -25,11 +25,11 @@ public class InternalFileWriter {
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
+        this.context = context;
         this.permissionInquirer = new PermissionInquirer(this.context);
         if(!this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
             throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
         }
-        this.context = context;
         this.fileName = fileName;
         this.fullPath = this.context.getFilesDir().getAbsolutePath() + "/" + this.fileName;
         this.useBaseDirectory = true;
@@ -38,6 +38,7 @@ public class InternalFileWriter {
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
+        this.context = context;
         this.permissionInquirer = new PermissionInquirer(this.context);
         if(!this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
             throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
@@ -59,7 +60,6 @@ public class InternalFileWriter {
                 this.directoryContainer = directoryContainer;
             }
         }
-        this.context = context;
         this.fullPath = this.context.getFilesDir() + "/" + this.directoryContainer + "/" + this.fileName;
         this.useBaseDirectory = false;
     }
