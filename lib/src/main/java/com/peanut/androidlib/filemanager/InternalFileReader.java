@@ -3,6 +3,8 @@ package com.peanut.androidlib.filemanager;
 import android.content.Context;
 import android.content.ContextWrapper;
 
+import com.peanut.androidlib.R;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +34,7 @@ public class InternalFileReader {
     }
     public InternalFileReader(Context context, String directoryContainer, String fileName){
         if(context == null){
-            throw new IllegalArgumentException("Activity cannot be null.");
+            throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
         this.context = context;
         this.fileName = fileName;
@@ -58,12 +60,33 @@ public class InternalFileReader {
     public String getFullPath(){
         return this.fullPath;
     }
+    public boolean exists(String fileName){
+        File file = new File(this.context.getFilesDir() + "/" + fileName);
+        return file.exists();
+    }
+    public boolean exists(String directoryContainer, String fileName){
+        if(directoryContainer.charAt(0) == '/'){
+            if(directoryContainer.charAt(directoryContainer.length() - 1) == '/'){
+                directoryContainer = directoryContainer.substring(1, directoryContainer.length() - 1);
+            }
+            else{
+                directoryContainer = directoryContainer.substring(1);
+            }
+        }
+        else{
+            if(directoryContainer.charAt(directoryContainer.length() - 1) == '/'){
+                directoryContainer = directoryContainer.substring(0, directoryContainer.length() - 1);
+            }
+        }
+        File file = new File(this.context.getFilesDir() + "/" + directoryContainer + "/" + fileName);
+        return file.exists();
+    }
     public String readLine(){
         String line = "";
         if(this.file == null){
             this.file = new File(this.fullPath);
             if(!this.file.exists()){
-                throw new RuntimeException("File " + this.fileName + " doesn't exist.");
+                throw new RuntimeException(String.format(this.context.getString(R.string.file_does_not_exist), this.fileName));
             }
             else{
                 try {
