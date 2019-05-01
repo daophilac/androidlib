@@ -131,4 +131,50 @@ public class InternalFileWriter {
             e.printStackTrace();
         }
     }
+    public void writeLine(String content, boolean append){
+        if(!this.useBaseDirectory){
+            File directory = new File(this.context.getFilesDir() + "/" + this.directoryContainer);
+            if(!directory.exists()){
+                directory.mkdirs();
+            }
+        }
+        File file = new File(this.fullPath);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file, append);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            String separator = System.getProperty("line.separator");
+            outputStreamWriter.append(content);
+            outputStreamWriter.append(separator);
+            outputStreamWriter.close();
+            fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public void writeLines(String[] contents, boolean append){
+        if(!this.useBaseDirectory){
+            File directory = new File(this.context.getFilesDir() + "/" + this.directoryContainer);
+            if(!directory.exists()){
+                directory.mkdirs();
+            }
+        }
+        File file = new File(this.fullPath);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(file, append);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+            String separator = System.getProperty("line.separator");
+            for (String content : contents) {
+                outputStreamWriter.append(content);
+                outputStreamWriter.append(separator);
+            }
+            outputStreamWriter.close();
+            fileOutputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
