@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/androidlib.iml" filepath="$PROJECT_DIR$/androidlib.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/folderpicker/folderpicker.iml" filepath="$PROJECT_DIR$/folderpicker/folderpicker.iml" />
+      <module fileurl="file://$PROJECT_DIR$/folderpickerexample/folderpickerexample.iml" filepath="$PROJECT_DIR$/folderpickerexample/folderpickerexample.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
     </modules>
   </component>

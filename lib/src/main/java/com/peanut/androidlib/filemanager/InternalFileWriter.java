@@ -27,7 +27,7 @@ public class InternalFileWriter {
         }
         this.context = context;
         this.permissionInquirer = new PermissionInquirer(this.context);
-        if(!this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
+        if(this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
             throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
         }
         this.fileName = fileName;
@@ -40,7 +40,7 @@ public class InternalFileWriter {
         }
         this.context = context;
         this.permissionInquirer = new PermissionInquirer(this.context);
-        if(!this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
+        if(this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
             throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
         }
         this.fileName = fileName;

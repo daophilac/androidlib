@@ -48,9 +48,6 @@ public class PermissionInquirer {
         }
     }
     public boolean checkPermission(String permission){
-        if(ContextCompat.checkSelfPermission(this.context, permission) != PackageManager.PERMISSION_GRANTED){
-            return false;
-        }
-        return true;
+        return ContextCompat.checkSelfPermission(this.context, permission) == PackageManager.PERMISSION_GRANTED;
     }
 }

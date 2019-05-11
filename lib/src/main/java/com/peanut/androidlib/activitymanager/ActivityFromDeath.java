@@ -3,6 +3,8 @@ package com.peanut.androidlib.activitymanager;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.HashMap;
 
@@ -35,6 +37,7 @@ public class ActivityFromDeath extends SoulSummoner {
             return;
         }
         this.activityFromDeathListener.getBundle();
+        this.activityFromDeathListener.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         Intent intent = new Intent(activity, ActivityFromDeath.class);
         intent.setAction(SoulSummoner.ActivitySignal.ON_RESUME);
         activity.sendOrderedBroadcast(intent, null);
@@ -49,6 +52,7 @@ public class ActivityFromDeath extends SoulSummoner {
     }
     public interface ActivityFromDeathListener {
         HashMap<String, Bundle> buildBundle();
+        Window getWindow();
         void getBundle();
     }
 }
