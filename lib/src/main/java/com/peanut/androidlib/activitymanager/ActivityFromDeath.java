@@ -19,6 +19,7 @@ public class ActivityFromDeath extends SoulSummoner {
         this.activityFromDeathListener = (ActivityFromDeathListener) activity;
         this.started = false;
         this.stopped = false;
+        this.activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         SoulSummoner.setActivityClass(activity.getClass());
     }
     public void sendOnStopSignal(){
@@ -37,7 +38,6 @@ public class ActivityFromDeath extends SoulSummoner {
             return;
         }
         this.activityFromDeathListener.getBundle();
-        this.activityFromDeathListener.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         Intent intent = new Intent(activity, ActivityFromDeath.class);
         intent.setAction(SoulSummoner.ActivitySignal.ON_RESUME);
         activity.sendOrderedBroadcast(intent, null);
@@ -52,7 +52,6 @@ public class ActivityFromDeath extends SoulSummoner {
     }
     public interface ActivityFromDeathListener {
         HashMap<String, Bundle> buildBundle();
-        Window getWindow();
         void getBundle();
     }
 }
