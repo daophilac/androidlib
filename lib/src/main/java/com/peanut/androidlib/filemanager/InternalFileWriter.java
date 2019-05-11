@@ -13,23 +13,16 @@ import java.io.OutputStreamWriter;
 
 public class InternalFileWriter {
     private static final String CONTEXT_IS_NULL = "Context cannot be null.";
-    private static final String READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED = "Read external storage permission has not been granted.";
     private Context context;
     private String directoryContainer;
     private String fileName;
     private String fullPath;
     private boolean useBaseDirectory;
-
-    private PermissionInquirer permissionInquirer;
     public InternalFileWriter(Context context, String fileName){
         if(context == null){
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
         this.context = context;
-        this.permissionInquirer = new PermissionInquirer(this.context);
-        if(this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
-            throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
-        }
         this.fileName = fileName;
         this.fullPath = this.context.getFilesDir().getAbsolutePath() + "/" + this.fileName;
         this.useBaseDirectory = true;
@@ -39,10 +32,6 @@ public class InternalFileWriter {
             throw new IllegalArgumentException(CONTEXT_IS_NULL);
         }
         this.context = context;
-        this.permissionInquirer = new PermissionInquirer(this.context);
-        if(this.permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
-            throw new IllegalStateException(READ_EXTERNAL_STORAGE_PERMISSION_HAS_NOT_BEEN_GRANTED);
-        }
         this.fileName = fileName;
         if(directoryContainer.charAt(0) == '/'){
             if(directoryContainer.charAt(directoryContainer.length() - 1) == '/'){
