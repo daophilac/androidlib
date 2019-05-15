@@ -23,9 +23,12 @@ class SoulSummoner extends BroadcastReceiver {
     public static void setMapBundleActivity(HashMap<String, Bundle> mapBundleActivity){
         SoulSummoner.mapBundleActivity = mapBundleActivity;
     }
+    public static HashMap<String, Bundle> getMapBundleActivity(){
+        return SoulSummoner.mapBundleActivity;
+    }
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(ActivitySignal.ON_STOP)){
+        if(intent.getAction().equals(ActivitySignal.ON_STOP.value)){
             state = State.ON_STOP;
             if(soulSummonerListener == null){
                 Intent intentRevive = new Intent(context, activityClass);
@@ -39,7 +42,7 @@ class SoulSummoner extends BroadcastReceiver {
                 this.threadReviver.start();
             }
         }
-        else if(intent.getAction().equals(ActivitySignal.ON_RESUME)){
+        else if(intent.getAction().equals(ActivitySignal.ON_RESUME.value)){
             if(state == State.ON_STOP){
                 // Safely stop the reviver;
                 if(soulSummonerListener != null){
@@ -81,8 +84,15 @@ class SoulSummoner extends BroadcastReceiver {
     private enum State{
         ON_STOP, DONE
     }
-    static final class ActivitySignal{
-        static final String ON_STOP = "onStop";
-        static final String ON_RESUME = "onResume";
+    enum ActivitySignal{
+        ON_STOP("onStop"), ON_RESUME("onResume");
+        private final String value;
+        ActivitySignal(String value){
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }

@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 
 public class InternalFileReader {
     private static final String CONTEXT_IS_NULL = "Context cannot be null.";
+    private static final String FILE_DOES_NOT_EXIST = "File %s does not exist.";
     private Context context;
     private String directoryContainer;
     private String fileName;
@@ -86,7 +87,7 @@ public class InternalFileReader {
         if(this.file == null){
             this.file = new File(this.fullPath);
             if(!this.file.exists()){
-                throw new RuntimeException(String.format(this.context.getString(R.string.file_does_not_exist), this.fileName));
+                throw new RuntimeException(String.format(FILE_DOES_NOT_EXIST, this.fileName));
             }
             else{
                 try {
