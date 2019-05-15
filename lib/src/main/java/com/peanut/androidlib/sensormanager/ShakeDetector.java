@@ -9,45 +9,39 @@ import android.hardware.SensorManager;
 import java.util.List;
 
 public class ShakeDetector {
-    private Context context;
+    private ShakeDetectorListener shakeDetectorListener;
     private SensorManager sensorManager;
     private List<Sensor> listSensor;
     private Sensor sensor;
-    private ShakeListener shakeListener;
     private boolean running;
     private SensorEventListener sensorEventListener;
     private long minInterval;
     private float minForce;
-    private static boolean supported;
-    private ShakeDetector(){}
-    public static ShakeDetector newInstance(Context context){
+    private boolean supported;
+    public ShakeDetector(Context context){
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> listSensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         if(listSensor.size() == 0){
-            supported = false;
-            return new ShakeDetector();
+            this.supported = false;
         }
         else{
-            supported = true;
-            ShakeDetector shakeDetector = new ShakeDetector();
-            shakeDetector.context = context;
-            shakeDetector.sensorManager = sensorManager;
-            shakeDetector.listSensor = listSensor;
-            shakeDetector.sensor = listSensor.get(0);
-            shakeDetector.running = false;
-            shakeDetector.configureDefault();
-            return shakeDetector;
+            this.supported = true;
+            this.sensorManager = sensorManager;
+            this.listSensor = listSensor;
+            this.sensor = listSensor.get(0);
+            this.running = false;
+            this.configureDefault();
         }
     }
-    public void start(ShakeListener shakeListener){
-        if(!ShakeDetector.supported){
-            shakeListener.onNoSupportDetection();
+    public void start(ShakeDetectorListener shakeDetectorListener){
+        this.shakeDetectorListener = shakeDetectorListener;
+        if(!supported){
+            shakeDetectorListener.onNoSupportDetection();
         }
         else{
+            shakeDetectorListener.onSupportDetection();
             if(!this.running){
-                shakeListener.onSupportDetection();
                 this.running = true;
-                this.shakeListener = shakeListener;
                 this.sensorEventListener = new SensorEventListener() {
                     private long now;
                     private long previous = 0;
@@ -73,8 +67,8 @@ public class ShakeDetector {
                             if(now - previous > minInterval){
                                 float force = Math.abs(nowX + nowY + nowZ - previousX - previousY - previousZ);
                                 if(force > minForce){
-                                    ShakeDetector.this.shakeListener.onAccelerationChange(nowX, nowY, nowZ);
-                                    ShakeDetector.this.shakeListener.onShake(force);
+                                    shakeDetectorListener.onAccelerationChange(nowX, nowY, nowZ);
+                                    shakeDetectorListener.onShake(force);
                                     previous = now;
                                     previousX = nowX;
                                     previousY = nowY;
@@ -96,7 +90,7 @@ public class ShakeDetector {
     public void stop(){
         if(this.isRunning()){
             this.sensorManager.unregisterListener(this.sensorEventListener);
-            this.shakeListener.onStopDetection();
+            this.shakeDetectorListener.onStopDetection();
         }
     }
     private void configureDefault(){
@@ -113,20 +107,7 @@ public class ShakeDetector {
     public boolean isRunning(){
         return this.running;
     }
-    public boolean checkSupport(Context context){
-        SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        List<Sensor> listSensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if(listSensor.size() == 0){
-            supported = false;
-            return false;
-        }
-        else{
-            supported = true;
-            return true;
-        }
-    }
-
-    public interface ShakeListener {
+    public interface ShakeDetectorListener {
         void onAccelerationChange(float x, float y, float z);
         void onShake(float force);
         void onSupportDetection();
