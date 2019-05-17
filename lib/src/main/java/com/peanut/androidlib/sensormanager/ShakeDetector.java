@@ -11,7 +11,6 @@ import java.util.List;
 public class ShakeDetector {
     private ShakeDetectorListener shakeDetectorListener;
     private SensorManager sensorManager;
-    private List<Sensor> listSensor;
     private Sensor sensor;
     private boolean running;
     private SensorEventListener sensorEventListener;
@@ -27,7 +26,6 @@ public class ShakeDetector {
         else{
             this.supported = true;
             this.sensorManager = sensorManager;
-            this.listSensor = listSensor;
             this.sensor = listSensor.get(0);
             this.running = false;
             this.configureDefault();
