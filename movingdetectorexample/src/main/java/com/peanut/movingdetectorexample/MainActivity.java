@@ -90,28 +90,37 @@ public class MainActivity extends AppCompatActivity {
         textViewStatus = findViewById(R.id.text_view_status);
 
         buttonStart.setOnClickListener(v -> {
-            distanceToMove = Float.parseFloat(editTextDistanceToMove.getText().toString());
-            distanceHasMoved = 0;
-            textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
-            textViewStatus.setTextColor(getResources().getColor(R.color.colorBlue));
-            textViewStatus.setText(getString(R.string.tracking));
             if(!locationDetector.isRunning()){
-                locationDetector.start(new MovingDetector.MovingDetectorListener() {
+                locationDetector.checkLocationSetting(new LocationTracker.OnLocationSettingResultListener() {
                     @Override
-                    public void onMoved(float distance, String furtherDetails) {
-                        textViewFurtherDetails.setText(furtherDetails);
-                        distanceHasMoved += distance;
+                    public void onSatisfiedSetting() {
+                        distanceToMove = Float.parseFloat(editTextDistanceToMove.getText().toString());
+                        distanceHasMoved = 0;
                         textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
-                        distanceToMove -= distance;
-                        if(distanceToMove <= 0){
-                            locationDetector.stop();
-                            textViewStatus.setTextColor(getResources().getColor(R.color.colorGreen));
-                            textViewStatus.setText(getString(R.string.done));
-                        }
+                        textViewStatus.setTextColor(getResources().getColor(R.color.colorBlue));
+                        textViewStatus.setText(getString(R.string.tracking));
+                        locationDetector.start(new MovingDetector.MovingDetectorListener() {
+                            @Override
+                            public void onMoved(float distance, String furtherDetails) {
+                                textViewFurtherDetails.setText(furtherDetails);
+                                distanceHasMoved += distance;
+                                textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
+                                distanceToMove -= distance;
+                                if(distanceToMove <= 0){
+                                    locationDetector.stop();
+                                    textViewStatus.setTextColor(getResources().getColor(R.color.colorGreen));
+                                    textViewStatus.setText(getString(R.string.done));
+                                }
+                            }
+                            @Override
+                            public void onFinished() {
+
+                            }
+                        });
                     }
                     @Override
-                    public void onFinished() {
-
+                    public void onUnsatisfiedSetting(Exception e) {
+                        locationDetector.requestSelfLocationSettings(2);
                     }
                 });
             }
@@ -124,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         });
         buttonResume.setOnClickListener(v -> {
             if(locationDetector.isRunning()){
+                locationDetector.requestSelfLocationSettings(1);
                 locationDetector.resume();
                 textViewStatus.setText(getString(R.string.tracking));
             }
@@ -155,6 +165,36 @@ public class MainActivity extends AppCompatActivity {
             case 1:
                 if(resultCode == RESULT_OK){
                     configureControls();
+                }
+                else{
+                    new UnsatisfiedSettingDialogFragment().show(getSupportFragmentManager(), this.getPackageName());
+                }
+                break;
+            case 2:
+                if(resultCode == RESULT_OK){
+                    distanceToMove = Float.parseFloat(editTextDistanceToMove.getText().toString());
+                    distanceHasMoved = 0;
+                    textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
+                    textViewStatus.setTextColor(getResources().getColor(R.color.colorBlue));
+                    textViewStatus.setText(getString(R.string.tracking));
+                    locationDetector.start(new MovingDetector.MovingDetectorListener() {
+                        @Override
+                        public void onMoved(float distance, String furtherDetails) {
+                            textViewFurtherDetails.setText(furtherDetails);
+                            distanceHasMoved += distance;
+                            textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
+                            distanceToMove -= distance;
+                            if(distanceToMove <= 0){
+                                locationDetector.stop();
+                                textViewStatus.setTextColor(getResources().getColor(R.color.colorGreen));
+                                textViewStatus.setText(getString(R.string.done));
+                            }
+                        }
+                        @Override
+                        public void onFinished() {
+
+                        }
+                    });
                 }
                 else{
                     new UnsatisfiedSettingDialogFragment().show(getSupportFragmentManager(), this.getPackageName());
