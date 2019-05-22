@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.peanut.commonlibs.permissionmanager.PermissionInquirer;
 import com.peanut.sensormanager.LocationTracker;
@@ -48,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationServiceOff() {
                 locationDetector.requestSelfLocationSettings(1);
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                MainActivity.this.sendBroadcast(intent);
             }
 
             @Override
@@ -59,13 +61,11 @@ public class MainActivity extends AppCompatActivity {
         locationDetector.registerHighAccuracyModeListener(new LocationTracker.HighAccuracyModeListener() {
             @Override
             public void onEnter() {
-                Toast.makeText(MainActivity.this, "enter", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onExit() {
                 locationDetector.requestSelfLocationSettings(1);
-                Toast.makeText(MainActivity.this, "exit", Toast.LENGTH_LONG).show();
             }
         });
         locationDetector.checkLocationSetting(new LocationTracker.OnLocationSettingResultListener() {

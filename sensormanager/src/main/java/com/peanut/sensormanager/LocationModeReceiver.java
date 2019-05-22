@@ -42,7 +42,6 @@ class LocationModeReceiver extends BroadcastReceiver {
     }
     void resume(){
         running = true;
-        context.registerReceiver(this, intentFilter);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
             locationServiceIsOn = locationManager.isLocationEnabled();
         }
@@ -57,15 +56,12 @@ class LocationModeReceiver extends BroadcastReceiver {
         }
     }
     void pause(){
-        context.unregisterReceiver(this);
         running = false;
     }
     void stop(){
-        if(running){
-            unregisterListeners();
-            context.unregisterReceiver(this);
-            running = false;
-        }
+        unregisterListeners();
+        context.unregisterReceiver(this);
+        running = false;
     }
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -75,12 +71,17 @@ class LocationModeReceiver extends BroadcastReceiver {
                     if(!locationServiceIsOn){
                         locationServiceIsOn = true;
                         locationServiceListener.onLocationServiceOn();
+                        resume();
                     }
                 }
                 else{
+                    if(!running){
+                        return;
+                    }
                     if(locationServiceIsOn){
                         locationServiceIsOn = false;
                         locationServiceListener.onLocationServiceOff();
+                        pause();
                     }
                 }
             }
@@ -90,12 +91,17 @@ class LocationModeReceiver extends BroadcastReceiver {
                     if(!locationServiceIsOn){
                         locationServiceIsOn = true;
                         locationServiceListener.onLocationServiceOn();
+                        resume();
                     }
                 }
                 else{
+                    if(!running){
+                        return;
+                    }
                     if(locationServiceIsOn){
                         locationServiceIsOn = false;
                         locationServiceListener.onLocationServiceOff();
+                        pause();
                     }
                 }
                 if(!locationServiceIsOn){
