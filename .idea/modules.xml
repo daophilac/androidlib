@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/activitymanager/activitymanager.iml" filepath="$PROJECT_DIR$/activitymanager/activitymanager.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidlib.iml" filepath="$PROJECT_DIR$/androidlib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commonlibs/commonlibs.iml" filepath="$PROJECT_DIR$/commonlibs/commonlibs.iml" />
       <module fileurl="file://$PROJECT_DIR$/folderpicker/folderpicker.iml" filepath="$PROJECT_DIR$/folderpicker/folderpicker.iml" />
       <module fileurl="file://$PROJECT_DIR$/folderpickerexample/folderpickerexample.iml" filepath="$PROJECT_DIR$/folderpickerexample/folderpickerexample.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/movingdetectorexample/movingdetectorexample.iml" filepath="$PROJECT_DIR$/movingdetectorexample/movingdetectorexample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sensormanager/sensormanager.iml" filepath="$PROJECT_DIR$/sensormanager/sensormanager.iml" />
     </modules>
   </component>
 </project>
