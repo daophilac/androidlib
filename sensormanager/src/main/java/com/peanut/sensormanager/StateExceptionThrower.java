@@ -50,6 +50,11 @@ final class StateExceptionThrower {
         }
         state = State.STOP;
     }
+
+    public State getState() {
+        return state;
+    }
+
     enum State{
         INITIAL, START, RESUME, PAUSE, STOP
     }

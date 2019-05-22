@@ -21,7 +21,7 @@ public class MovingDetector{
     public class LocationDetector{
         private static final String ACCURACY_RADIUS_FORMAT = "Accuracy radius: %f";
         private static final long DEFAULT_INTERVAL = 2000;
-        private static final float DEFAULT_ACCURACY_RADIUS = 15;
+        private static final float DEFAULT_ACCURACY_RADIUS = 50;
         private LocationTracker locationTracker;
         private Location currentLocation;
         private StateExceptionThrower stateExceptionThrower;
@@ -34,6 +34,9 @@ public class MovingDetector{
             stateExceptionThrower.validateInitial();
         }
         public void start(MovingDetectorListener movingDetectorListener){
+            if(stateExceptionThrower.getState() == StateExceptionThrower.State.START){
+                return;
+            }
             stateExceptionThrower.validateStart();
             running = true;
             MovingDetector.this.movingDetectorListener = movingDetectorListener;
@@ -50,14 +53,23 @@ public class MovingDetector{
             });
         }
         public void resume(){
+            if(stateExceptionThrower.getState() == StateExceptionThrower.State.RESUME){
+                return;
+            }
             stateExceptionThrower.validateResume();
             locationTracker.resume();
         }
         public void pause(){
+            if(stateExceptionThrower.getState() == StateExceptionThrower.State.PAUSE){
+                return;
+            }
             stateExceptionThrower.validatePause();
             locationTracker.pause();
         }
         public void stop(){
+            if(stateExceptionThrower.getState() == StateExceptionThrower.State.STOP){
+                return;
+            }
             stateExceptionThrower.validateStop();
             locationTracker.stop();
             movingDetectorListener.onFinished();
