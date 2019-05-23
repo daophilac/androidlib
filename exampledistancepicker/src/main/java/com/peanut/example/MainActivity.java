@@ -17,10 +17,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         distancePicker = findViewById(R.id.distance_picker);
-        measurementPicker = distancePicker.getMeasurementPicker();
-        integerPicker = distancePicker.getIntegerPicker();
-        integerPicker.setOnValueChangeListener((picker, oldVal, newVal) -> Toast.makeText(this, newVal + "", Toast.LENGTH_LONG).show());
-        measurementPicker.setOnMeasurementChangeListener((measurementPicker, oldValue, newValue) -> Toast.makeText(this, newValue.getLongValue(), Toast.LENGTH_LONG).show());
-        measurementPicker.setMeasurements(new MeasurementPicker.Measurement[]{MeasurementPicker.Measurement.KILOMETER, MeasurementPicker.Measurement.CENTIMETER});
+//        distancePicker.setBaseMinValue(1).setBaseMaxValue(1000).setSelectedValueIndex(0).perform();
+//        distancePicker.updateWrapSelectorWheel(false);
+//        measurementPicker = distancePicker.getMeasurementPicker();
+//        integerPicker = distancePicker.getIntegerPicker();
+//        integerPicker.setOnValueChangeListener((picker, oldVal, newVal) -> Toast.makeText(this, newVal + "", Toast.LENGTH_LONG).show());
+//        measurementPicker.setOnMeasurementChangeListener((measurementPicker, oldValue, newValue) -> Toast.makeText(this, newValue.getLongValue(), Toast.LENGTH_LONG).show());
+//        measurementPicker.setMeasurements(new MeasurementPicker.Measurement[]{MeasurementPicker.Measurement.KILOMETER, MeasurementPicker.Measurement.CENTIMETER});
     }
 }

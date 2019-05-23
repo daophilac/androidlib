@@ -39,6 +39,11 @@ public class DistancePicker extends LinearLayout {
         measurementPicker = view.findViewById(R.id.measurement_picker);
         integerPicker = view.findViewById(R.id.multiply_number_picker);
     }
+
+    public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+        measurementPicker.updateWrapSelectorWheel(wrapSelectorWheel);
+        integerPicker.updateWrapSelectorWheel(wrapSelectorWheel);
+    }
     public void perform(){
         integerPicker.perform();
     }
@@ -53,20 +58,24 @@ public class DistancePicker extends LinearLayout {
         measurementPicker.setMeasurements(measurements);
     }
 
-    public void setBaseMinValue(int baseMinValue) {
+    public DistancePicker setBaseMinValue(int baseMinValue) {
         integerPicker.setBaseMinValue(baseMinValue);
+        return this;
     }
 
-    public void setBaseMaxValue(int baseMaxValue) {
+    public DistancePicker setBaseMaxValue(int baseMaxValue) {
         integerPicker.setBaseMaxValue(baseMaxValue);
+        return this;
     }
 
-    public void setMultiplicationFactor(int multiplicationFactor) {
+    public DistancePicker setMultiplicationFactor(int multiplicationFactor) {
         integerPicker.setMultiplicationFactor(multiplicationFactor);
+        return this;
     }
 
-    public void setSelectedValueIndex(int selectedIndex) {
+    public DistancePicker setSelectedValueIndex(int selectedIndex) {
         integerPicker.setSelectedIndex(selectedIndex);
+        return this;
     }
 
     public void setOnMeasurementChangeListener(MeasurementPicker.OnMeasurementChangeListener onMeasurementChangeListener) {
@@ -75,10 +84,6 @@ public class DistancePicker extends LinearLayout {
 
     public void setOnValueChangeListener(NumberPicker.OnValueChangeListener onValueChangeListener) {
         integerPicker.setOnValueChangeListener(onValueChangeListener);
-    }
-    public void setWrapSelectorWheel(boolean wrapSelectorWheel){
-        measurementPicker.setWrapSelectorWheel(wrapSelectorWheel);
-        integerPicker.setWrapSelectorWheel(wrapSelectorWheel);
     }
     public MeasurementPicker.UnitStyle getUnitStyle() {
         return measurementPicker.getUnitStyle();

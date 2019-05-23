@@ -37,6 +37,10 @@ public class MeasurementPicker extends NumberPicker {
     final void setUnitStyle(int value){
         setUnitStyle(UnitStyle.newInstanceFromValue(value));
     }
+    public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+        setWrapSelectorWheel(wrapSelectorWheel);
+        setUnitStyle(unitStyle);
+    }
 
     // Setters
     public void setUnitStyle(UnitStyle unitStyle) {

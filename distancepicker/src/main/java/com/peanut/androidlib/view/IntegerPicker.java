@@ -46,6 +46,10 @@ public class IntegerPicker extends NumberPicker {
             throw new IllegalArgumentException(NEGATIVE_SELECTED_INDEX);
         }
         numElement = baseMaxValue - baseMinValue + 1;
+        // TODO
+        if(numElement > 5000){
+            throw new RuntimeException("There are many elements");
+        }
         if(selectedIndex >= numElement){
             throw new IllegalArgumentException(String.format(OUT_OF_RANGE_SELECTED_INDEX, selectedIndex, numElement));
         }
@@ -61,24 +65,32 @@ public class IntegerPicker extends NumberPicker {
         setMaxValue(numElement - 1);
         setValue(selectedIndex);
     }
+    public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+        setWrapSelectorWheel(wrapSelectorWheel);
+        setDisplayedValues(displayValues);
+    }
     public void perform(){
         validateValues();
         generateDisplayedValues();
     }
-    public void setBaseMinValue(int baseMinValue) {
+    public IntegerPicker setBaseMinValue(int baseMinValue) {
         this.baseMinValue = baseMinValue;
+        return this;
     }
 
-    public void setBaseMaxValue(int baseMaxValue) {
+    public IntegerPicker setBaseMaxValue(int baseMaxValue) {
         this.baseMaxValue = baseMaxValue;
+        return this;
     }
 
-    public void setMultiplicationFactor(int multiplicationFactor) {
+    public IntegerPicker setMultiplicationFactor(int multiplicationFactor) {
         this.multiplicationFactor = multiplicationFactor;
+        return this;
     }
 
-    public void setSelectedIndex(int selectedIndex) {
+    public IntegerPicker setSelectedIndex(int selectedIndex) {
         this.selectedIndex = selectedIndex;
+        return this;
     }
 
     public void setOnValueChangeListener(OnValueChangeListener onValueChangeListener) {
