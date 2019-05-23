@@ -8,9 +8,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.peanut.androidlib.general.ExecutionTimeTracker;
-import com.peanut.androidlib.permissionmanager.PermissionInquirer;
-import com.peanut.androidlib.worker.MultipleWorker;
+import com.peanut.androidlib.common.general.ExecutionTimeTracker;
+import com.peanut.androidlib.common.permissionmanager.PermissionInquirer;
+import com.peanut.androidlib.common.worker.MultipleWorker;
 
 import java.io.File;
 import java.util.ArrayList;

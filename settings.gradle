@@ -1,1 +1,1 @@
-include ':folderpicker', ':folderpickerexample', ':movingdetectorexample', ':sensormanager', ':activitymanager', ':commonlibs'
+include ':folderpicker', ':examplefolderpicker', ':examplemovingdetector', ':sensormanager', ':activitymanager', ':commonlibs', ':distancepicker', ':exampledistancepicker'

@@ -16,7 +16,7 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.peanut.androidlib.worker.MultipleWorker;
+import com.peanut.androidlib.common.worker.MultipleWorker;
 
 import java.io.File;
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DistancePicker">
+        <attr name="distancePickerStyle" format="reference"/>
+        <attr name="measurementPickerStyle"/>
+        <attr name="integerPickerStyle"/>
+        <attr name="unitStyle" />
+        <attr name="baseMinValue"/>
+        <attr name="baseMaxValue" />
+        <attr name="multiplicationFactor" />
+        <attr name="selectedIndex" />
+    </declare-styleable>
+    <declare-styleable name="MeasurementPicker">
+        <attr name="measurementPickerStyle" format="reference"/>
+        <attr name="unitStyle" format="enum">
+            <enum name="shortName" value="0"/>
+            <enum name="longName" value="1"/>
+        </attr>
+    </declare-styleable>
+    <declare-styleable name="IntegerPicker" >
+        <attr name="integerPickerStyle" format="reference"/>
+        <attr name="baseMinValue" format="integer"/>
+        <attr name="baseMaxValue" format="integer"/>
+        <attr name="multiplicationFactor" format="integer"/>
+        <attr name="selectedIndex" format="integer"/>
+    </declare-styleable>
+</resources>
