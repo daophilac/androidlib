@@ -38,6 +38,10 @@ public class DistancePicker extends LinearLayout {
         measurementPicker = view.findViewById(R.id.measurement_picker);
         integerPicker = view.findViewById(R.id.multiply_number_picker);
     }
+    public void setWrapSelectorWheel(boolean wrapSelectorWheel){
+        measurementPicker.setWrapSelectorWheel(wrapSelectorWheel);
+        integerPicker.setWrapSelectorWheel(wrapSelectorWheel);
+    }
 
     public MeasurementPicker getMeasurementPicker() {
         return measurementPicker;
