@@ -47,6 +47,12 @@ public class DistancePicker extends LinearLayout {
     public void perform(){
         integerPicker.perform();
     }
+    public void scrollDown(int scroll){
+        integerPicker.scrollDown(scroll);
+    }
+    public void scrollUp(int scroll){
+        integerPicker.scrollUp(scroll);
+    }
     public void setUnitStyle(MeasurementPicker.UnitStyle unitStyle) {
         measurementPicker.setUnitStyle(unitStyle);
     }

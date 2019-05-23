@@ -10,6 +10,9 @@ public class IntegerPicker extends NumberPicker {
     private static final String MAX_SMALLER_THAN_MIN = "baseMaxValue cannot be smaller than baseMinValue. baseMaxValue=%d, baseMinValue=%d";
     private static final String NEGATIVE_SELECTED_INDEX = "selectedIndex cannot be negative";
     private static final String OUT_OF_RANGE_SELECTED_INDEX = "selectedIndex is out of range. selectedIndex=%d, numElement=%d";
+    private static final String NEGATIVE_SCROLL_AMOUNT = "scroll amount cannot be negative";
+    private static final String SCROLL_PASS_FINAL_ELEMENT = "scroll passes final element. selectedIndex=%d, numElement=%d, scroll=%d";
+    private static final String SCROLL_PASS_FIRST_ELEMENT = "scroll passes first element. selectedIndex=%d, scroll=%d";
     public static final int defBaseMinValue = 0;
     public static final int defBaseMaxValue = 0;
     public static final int defMultiplicationFactor = 1;
@@ -61,9 +64,10 @@ public class IntegerPicker extends NumberPicker {
             values[i] = value;
             displayValues[i] = String.valueOf(value);
         }
-        setDisplayedValues(displayValues);
+        setDisplayedValues(null);
         setMaxValue(numElement - 1);
         setValue(selectedIndex);
+        setDisplayedValues(displayValues);
     }
     public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
         setWrapSelectorWheel(wrapSelectorWheel);
@@ -72,6 +76,26 @@ public class IntegerPicker extends NumberPicker {
     public void perform(){
         validateValues();
         generateDisplayedValues();
+    }
+    public void scrollDown(int scroll){
+        if(scroll < 0){
+            throw new IllegalArgumentException(NEGATIVE_SCROLL_AMOUNT);
+        }
+        if(selectedIndex + scroll >= numElement){
+            throw new RuntimeException(String.format(SCROLL_PASS_FINAL_ELEMENT, selectedIndex, numElement, scroll));
+        }
+        selectedIndex += scroll;
+        setValue(selectedIndex);
+    }
+    public void scrollUp(int scroll){
+        if(scroll < 0){
+            throw new IllegalArgumentException(NEGATIVE_SCROLL_AMOUNT);
+        }
+        if(selectedIndex - scroll < 0){
+            throw new RuntimeException(String.format(SCROLL_PASS_FIRST_ELEMENT, selectedIndex, scroll));
+        }
+        selectedIndex -= scroll;
+        setValue(selectedIndex);
     }
     public IntegerPicker setBaseMinValue(int baseMinValue) {
         this.baseMinValue = baseMinValue;
