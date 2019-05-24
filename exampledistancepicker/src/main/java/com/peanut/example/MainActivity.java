@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         distancePicker = findViewById(R.id.distance_picker);
-        distancePicker.setBaseMinValue(1).setBaseMaxValue(5).setSelectedValueIndex(1).perform();
-        distancePicker.scrollDown(2);
+        distancePicker.setBaseMinValue(1).setBaseMaxValue(5).setMultiplicationFactor(10).setSelectedValueIndex(1).perform();
+        distancePicker.setSelectedValue(50);
 //        distancePicker.updateWrapSelectorWheel(false);
 //        measurementPicker = distancePicker.getMeasurementPicker();
 //        integerPicker = distancePicker.getIntegerPicker();

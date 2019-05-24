@@ -47,11 +47,8 @@ public class DistancePicker extends LinearLayout {
     public void perform(){
         integerPicker.perform();
     }
-    public void scrollDown(int scroll){
-        integerPicker.scrollDown(scroll);
-    }
-    public void scrollUp(int scroll){
-        integerPicker.scrollUp(scroll);
+    public void scroll(int scroll){
+        integerPicker.scroll(scroll);
     }
     public void setUnitStyle(MeasurementPicker.UnitStyle unitStyle) {
         measurementPicker.setUnitStyle(unitStyle);
@@ -82,6 +79,10 @@ public class DistancePicker extends LinearLayout {
     public DistancePicker setSelectedValueIndex(int selectedIndex) {
         integerPicker.setSelectedIndex(selectedIndex);
         return this;
+    }
+
+    public void setSelectedValue(int selectedValue){
+        integerPicker.setSelectedValue(selectedValue);
     }
 
     public void setOnMeasurementChangeListener(MeasurementPicker.OnMeasurementChangeListener onMeasurementChangeListener) {
@@ -124,6 +125,10 @@ public class DistancePicker extends LinearLayout {
 
     public int getSelectedIndex() {
         return integerPicker.getSelectedIndex();
+    }
+
+    public int getSelectedValue(){
+        return integerPicker.getSelectedValue();
     }
 
     public int getNumElement() {

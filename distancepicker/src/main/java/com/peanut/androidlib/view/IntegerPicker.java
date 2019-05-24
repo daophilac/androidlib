@@ -10,9 +10,8 @@ public class IntegerPicker extends NumberPicker {
     private static final String MAX_SMALLER_THAN_MIN = "baseMaxValue cannot be smaller than baseMinValue. baseMaxValue=%d, baseMinValue=%d";
     private static final String NEGATIVE_SELECTED_INDEX = "selectedIndex cannot be negative";
     private static final String OUT_OF_RANGE_SELECTED_INDEX = "selectedIndex is out of range. selectedIndex=%d, numElement=%d";
-    private static final String NEGATIVE_SCROLL_AMOUNT = "scroll amount cannot be negative";
-    private static final String SCROLL_PASS_FINAL_ELEMENT = "scroll passes final element. selectedIndex=%d, numElement=%d, scroll=%d";
-    private static final String SCROLL_PASS_FIRST_ELEMENT = "scroll passes first element. selectedIndex=%d, scroll=%d";
+    private static final String INVALID_SELECTED_VALUE = "selectedValue must be divisible to multiplicationFactor. selectedValue=%d, multiplicationFactor=%d";
+    private static final String SELECTED_VALUE_GREATER_THAN_MAX = "selectedValue cannot be greater than maxValue. selectedValue=%d, maxValue=%d";
     public static final int defBaseMinValue = 0;
     public static final int defBaseMaxValue = 0;
     public static final int defMultiplicationFactor = 1;
@@ -21,6 +20,7 @@ public class IntegerPicker extends NumberPicker {
     private int baseMaxValue;
     private int multiplicationFactor;
     private int selectedIndex;
+    private int selectedValue;
     private int numElement;
     private int[] values;
     private String[] displayValues;
@@ -60,6 +60,7 @@ public class IntegerPicker extends NumberPicker {
     private void generateDisplayedValues(){
         values = new int[numElement];
         displayValues = new String[numElement];
+        selectedValue = values[selectedIndex];
         for(int i = 0, value = (i + baseMinValue) * multiplicationFactor; i < numElement; i++, value += multiplicationFactor){
             values[i] = value;
             displayValues[i] = String.valueOf(value);
@@ -77,24 +78,11 @@ public class IntegerPicker extends NumberPicker {
         validateValues();
         generateDisplayedValues();
     }
-    public void scrollDown(int scroll){
-        if(scroll < 0){
-            throw new IllegalArgumentException(NEGATIVE_SCROLL_AMOUNT);
-        }
-        if(selectedIndex + scroll >= numElement){
-            throw new RuntimeException(String.format(SCROLL_PASS_FINAL_ELEMENT, selectedIndex, numElement, scroll));
+    public void scroll(int scroll){
+        if(selectedIndex + scroll < 0 || selectedIndex + scroll >= numElement){
+            return;
         }
         selectedIndex += scroll;
-        setValue(selectedIndex);
-    }
-    public void scrollUp(int scroll){
-        if(scroll < 0){
-            throw new IllegalArgumentException(NEGATIVE_SCROLL_AMOUNT);
-        }
-        if(selectedIndex - scroll < 0){
-            throw new RuntimeException(String.format(SCROLL_PASS_FIRST_ELEMENT, selectedIndex, scroll));
-        }
-        selectedIndex -= scroll;
         setValue(selectedIndex);
     }
     public IntegerPicker setBaseMinValue(int baseMinValue) {
@@ -117,6 +105,18 @@ public class IntegerPicker extends NumberPicker {
         return this;
     }
 
+    public void setSelectedValue(int selectedValue){
+        if(selectedValue % multiplicationFactor != 0){
+            throw new IllegalArgumentException(String.format(INVALID_SELECTED_VALUE, selectedValue, multiplicationFactor));
+        }
+        if(selectedValue > values[numElement - 1]){
+            throw new IllegalArgumentException(String.format(SELECTED_VALUE_GREATER_THAN_MAX, selectedValue, values[numElement - 1]));
+        }
+        this.selectedValue = selectedValue;
+        this.selectedIndex = selectedValue / multiplicationFactor - baseMinValue;
+        setValue(selectedIndex);
+    }
+
     public void setOnValueChangeListener(OnValueChangeListener onValueChangeListener) {
         super.setOnValueChangedListener((picker, oldVal, newVal) -> onValueChangeListener.onValueChange(IntegerPicker.this, values[oldVal], values[newVal]));
     }
@@ -135,6 +135,10 @@ public class IntegerPicker extends NumberPicker {
 
     public int getSelectedIndex() {
         return selectedIndex;
+    }
+
+    public int getSelectedValue() {
+        return selectedValue;
     }
 
     public int getNumElement() {
