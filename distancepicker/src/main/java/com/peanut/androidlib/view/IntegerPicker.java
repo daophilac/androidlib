@@ -78,12 +78,13 @@ public class IntegerPicker extends NumberPicker {
         validateValues();
         generateDisplayedValues();
     }
-    public void scroll(int scroll){
+    public boolean scroll(int scroll){
         if(selectedIndex + scroll < 0 || selectedIndex + scroll >= numElement){
-            return;
+            return false;
         }
         selectedIndex += scroll;
         setValue(selectedIndex);
+        return true;
     }
     public IntegerPicker setBaseMinValue(int baseMinValue) {
         this.baseMinValue = baseMinValue;

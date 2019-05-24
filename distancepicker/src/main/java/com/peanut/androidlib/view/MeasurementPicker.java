@@ -66,6 +66,17 @@ public class MeasurementPicker extends NumberPicker {
         this.measurement = measurements[selectedIndex];
         setValue(selectedIndex);
     }
+    public boolean setMeasurement(Measurement measurement){
+        for(int i = 0; i < numElement; i++){
+            if(measurements[i] == measurement){
+                this.selectedIndex = i;
+                this.measurement = measurement;
+                setValue(selectedIndex);
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void setMeasurements(Measurement[] measurements) {
         this.measurements = measurements;

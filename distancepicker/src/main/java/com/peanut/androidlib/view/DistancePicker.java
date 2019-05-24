@@ -47,14 +47,17 @@ public class DistancePicker extends LinearLayout {
     public void perform(){
         integerPicker.perform();
     }
-    public void scroll(int scroll){
-        integerPicker.scroll(scroll);
+    public boolean scroll(int scroll){
+        return integerPicker.scroll(scroll);
     }
     public void setUnitStyle(MeasurementPicker.UnitStyle unitStyle) {
         measurementPicker.setUnitStyle(unitStyle);
     }
-    public void setSelectedUnitIndex(int selectedIndex){
+    public void setSelectedMeasurementIndex(int selectedIndex){
         measurementPicker.setSelectedIndex(selectedIndex);
+    }
+    public boolean setMeasurement(MeasurementPicker.Measurement measurement){
+        return measurementPicker.setMeasurement(measurement);
     }
 
     public void setMeasurements(MeasurementPicker.Measurement[] measurements) {
