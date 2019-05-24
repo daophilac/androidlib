@@ -8,14 +8,15 @@ import android.widget.NumberPicker;
 public class MeasurementPicker extends NumberPicker {
     private static final String NEGATIVE_INDEX = "index cannot be negative";
     private static final String OUT_OF_RANGE_INDEX = "index is out of range. index=%d, numElement=%d";
+    private static final String INVALID_INT_VALUE = "intValue is invalid. Valid values are from 0 to 4";
     private static final String INVALID_MEASUREMENT = "Invalid measurement=%s";
     public static final UnitStyle defUnitStyle = UnitStyle.SHORT;
     private UnitStyle unitStyle;
     private Measurement measurement;
     private int selectedIndex;
     private Measurement[] measurements = {Measurement.MILLIMETER, Measurement.CENTIMETER, Measurement.DECIMETER, Measurement.METER, Measurement.KILOMETER};
-    private String[] shortMeasurements = {Measurement.MILLIMETER.shortValue, Measurement.CENTIMETER.shortValue, Measurement.DECIMETER.shortValue, Measurement.METER.shortValue, Measurement.KILOMETER.shortValue};
-    private String[] longMeasurements = {Measurement.MILLIMETER.longValue, Measurement.CENTIMETER.longValue, Measurement.DECIMETER.longValue, Measurement.METER.longValue, Measurement.KILOMETER.longValue};
+    private String[] shortMeasurements = {Measurement.MILLIMETER.shortDisplayedValue, Measurement.CENTIMETER.shortDisplayedValue, Measurement.DECIMETER.shortDisplayedValue, Measurement.METER.shortDisplayedValue, Measurement.KILOMETER.shortDisplayedValue};
+    private String[] longMeasurements = {Measurement.MILLIMETER.longDisplayedValue, Measurement.CENTIMETER.longDisplayedValue, Measurement.DECIMETER.longDisplayedValue, Measurement.METER.longDisplayedValue, Measurement.KILOMETER.longDisplayedValue};
     private int numElement;
     public MeasurementPicker(Context context) {
         super(context);
@@ -73,8 +74,8 @@ public class MeasurementPicker extends NumberPicker {
         this.shortMeasurements = new String[numElement];
         this.longMeasurements = new String[numElement];
         for(int i = 0; i < numElement; i++){
-            shortMeasurements[i] = measurements[i].shortValue;
-            longMeasurements[i] = measurements[i].longValue;
+            shortMeasurements[i] = measurements[i].shortDisplayedValue;
+            longMeasurements[i] = measurements[i].longDisplayedValue;
         }
         if(selectedIndex >= numElement){
             selectedIndex = 0;
@@ -140,47 +141,80 @@ public class MeasurementPicker extends NumberPicker {
     }
     public enum Measurement{
         MILLIMETER("Millimeter"), CENTIMETER("Centimeter"), DECIMETER("Decimeter") ,METER("Meter"), KILOMETER("Kilometer");
-        private final String shortValue;
-        private final String longValue;
-        Measurement(String longValue){
-            this.longValue = longValue;
-            switch (longValue){
+        private final int intValue;
+        private final String shortDisplayedValue;
+        private final String longDisplayedValue;
+        Measurement(String longDisplayedValue){
+            this.longDisplayedValue = longDisplayedValue;
+            switch (longDisplayedValue){
                 case "Millimeter":
-                    shortValue = "mm ";
+                    intValue = 0;
+                    shortDisplayedValue = "mm";
                     break;
                 case "Centimeter":
-                    shortValue = "cm ";
+                    intValue = 1;
+                    shortDisplayedValue = "cm";
                     break;
                 case "Decimeter":
-                    shortValue = "dm ";
+                    intValue = 2;
+                    shortDisplayedValue = "dm";
                     break;
                 case "Meter":
-                    shortValue = "m ";
+                    intValue = 3;
+                    shortDisplayedValue = "m";
                     break;
                 case "Kilometer":
-                    shortValue = "mm ";
+                    intValue = 4;
+                    shortDisplayedValue = "mm";
                     break;
                 default:
-                    shortValue = "";
+                    intValue = -1;
+                    shortDisplayedValue = "";
             }
         }
-        public String getShortValue() {
-            return shortValue;
+
+        public int getIntValue() {
+            return intValue;
         }
-        public String getLongValue() {
-            return longValue;
+        public String getShortDisplayedValue() {
+            return shortDisplayedValue;
         }
-        public static Measurement newInstanceFromValue(String value){
+        public String getLongDisplayedValue() {
+            return longDisplayedValue;
+        }
+        public static Measurement newInstanceFromIntValue(int intValue){
+            switch(intValue){
+                case 0:
+                    return MILLIMETER;
+                case 1:
+                    return CENTIMETER;
+                case 2:
+                    return DECIMETER;
+                case 3:
+                    return METER;
+                case 4:
+                    return KILOMETER;
+                default:
+                    throw new IllegalArgumentException(INVALID_INT_VALUE);
+
+            }
+        }
+        public static Measurement newInstanceFromDisplayedValue(String value){
             value = value.toLowerCase();
             switch(value){
+                case "mm":
                 case "millimeter":
                     return MILLIMETER;
+                case "cm":
                 case "centimeter":
                     return CENTIMETER;
+                case "dm":
                 case "decimeter":
                     return DECIMETER;
+                case "m":
                 case "meter":
                     return METER;
+                case "km":
                 case "kilometer":
                     return KILOMETER;
                 default:

@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
 //        measurementPicker = distancePicker.getMeasurementPicker();
 //        integerPicker = distancePicker.getIntegerPicker();
 //        integerPicker.setOnValueChangeListener((picker, oldVal, newVal) -> Toast.makeText(this, newVal + "", Toast.LENGTH_LONG).show());
-//        measurementPicker.setOnMeasurementChangeListener((measurementPicker, oldValue, newValue) -> Toast.makeText(this, newValue.getLongValue(), Toast.LENGTH_LONG).show());
+//        measurementPicker.setOnMeasurementChangeListener((measurementPicker, oldValue, newValue) -> Toast.makeText(this, newValue.getLongDisplayedValue(), Toast.LENGTH_LONG).show());
 //        measurementPicker.setMeasurements(new MeasurementPicker.Measurement[]{MeasurementPicker.Measurement.KILOMETER, MeasurementPicker.Measurement.CENTIMETER});
     }
 }
