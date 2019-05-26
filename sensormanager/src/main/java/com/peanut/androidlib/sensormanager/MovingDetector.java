@@ -7,7 +7,6 @@ import java.util.Locale;
 
 public class MovingDetector{
     private Context context;
-    private MovingDetectorListener movingDetectorListener;
     private long minDistanceThreshold = 0;
     private boolean running = false;
     private LocationDetector locationDetector;
@@ -21,7 +20,10 @@ public class MovingDetector{
     public class LocationDetector{
         private static final String ACCURACY_RADIUS_FORMAT = "Accuracy radius: %f";
         private static final long DEFAULT_INTERVAL = 2000;
-        private static final float DEFAULT_ACCURACY_RADIUS = 50;
+        private static final float DEFAULT_ACCURACY_RADIUS = 15;
+        private boolean debug;
+        private MovingDetectorListener movingDetectorListener;
+        private MovingDetectorListenerDebug movingDetectorListenerDebug;
         private LocationTracker locationTracker;
         private Location currentLocation;
         private StateExceptionThrower stateExceptionThrower;
@@ -38,8 +40,9 @@ public class MovingDetector{
                 return;
             }
             stateExceptionThrower.validateStart();
+            debug = false;
             running = true;
-            MovingDetector.this.movingDetectorListener = movingDetectorListener;
+            this.movingDetectorListener = movingDetectorListener;
             locationTracker.start(location -> {
                 if(currentLocation == null){
                     currentLocation = location;
@@ -48,6 +51,27 @@ public class MovingDetector{
                 float distance = currentLocation.distanceTo(location);
                 if(distance >= minDistanceThreshold){
                     movingDetectorListener.onMoved(distance, String.format(Locale.US, ACCURACY_RADIUS_FORMAT, location.getAccuracy()));
+                    currentLocation = location;
+                }
+            });
+        }
+        public void startDebug(MovingDetectorListenerDebug movingDetectorListenerDebug){
+            if(stateExceptionThrower.getState() == StateExceptionThrower.State.START){
+                return;
+            }
+            stateExceptionThrower.validateStart();
+            debug = true;
+            running = true;
+            this.movingDetectorListenerDebug = movingDetectorListenerDebug;
+            locationTracker.start(location -> {
+                if(currentLocation == null){
+                    currentLocation = location;
+                    return;
+                }
+                movingDetectorListenerDebug.onUpdate(String.valueOf(location.getAccuracy()));
+                float distance = currentLocation.distanceTo(location);
+                if(distance >= minDistanceThreshold){
+                    movingDetectorListenerDebug.onMoved(distance, String.format(Locale.US, ACCURACY_RADIUS_FORMAT, location.getAccuracy()));
                     currentLocation = location;
                 }
             });
@@ -72,7 +96,12 @@ public class MovingDetector{
             }
             stateExceptionThrower.validateStop();
             locationTracker.stop();
-            movingDetectorListener.onFinished();
+            if(debug){
+                movingDetectorListenerDebug.onStop();
+            }
+            else{
+                movingDetectorListener.onStop();
+            }
             running = false;
         }
         public void checkLocationSetting(LocationTracker.OnLocationSettingResultListener onLocationSettingResultListener){
@@ -80,6 +109,9 @@ public class MovingDetector{
         }
         public void setInterval(long interval) {
             locationTracker.setInterval(interval);
+        }
+        public void setMaxAccuracyRadius(float accuracyRadius){
+            locationTracker.setMaxAccuracyRadiusThreshold(accuracyRadius);
         }
         public void requestSelfLocationSettings(int requestCode){
             locationTracker.requestSelfLocationSettings(requestCode);
@@ -129,6 +161,11 @@ public class MovingDetector{
     }
     public interface MovingDetectorListener {
         void onMoved(float distance, String furtherDetails);
-        void onFinished();
+        void onStop();
+    }
+    public interface MovingDetectorListenerDebug{
+        void onMoved(float distance, String furtherDetails);
+        void onUpdate(String accuracy);
+        void onStop();
     }
 }

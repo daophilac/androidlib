@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             }
                             @Override
-                            public void onFinished() {
+                            public void onStop() {
 
                             }
                         });
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         @Override
-                        public void onFinished() {
+                        public void onStop() {
 
                         }
                     });
