@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         distancePicker = findViewById(R.id.distance_picker);
         distancePicker.setBaseMinValue(1).setBaseMaxValue(5).setMultiplicationFactor(10).setSelectedValueIndex(1).perform();
         distancePicker.setSelectedValue(50);
-//        distancePicker.updateWrapSelectorWheel(false);
+        distancePicker.updateWrapSelectorWheel(false);
 //        measurementPicker = distancePicker.getMeasurementPicker();
 //        integerPicker = distancePicker.getIntegerPicker();
 //        integerPicker.setOnValueChangeListener((picker, oldVal, newVal) -> Toast.makeText(this, newVal + "", Toast.LENGTH_LONG).show());

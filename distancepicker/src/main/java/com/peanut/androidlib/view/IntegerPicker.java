@@ -24,6 +24,7 @@ public class IntegerPicker extends NumberPicker {
     private int numElement;
     private int[] values;
     private String[] displayValues;
+    private boolean wrapSelectorWheel;
     public IntegerPicker(Context context) {
         super(context);
     }
@@ -68,9 +69,12 @@ public class IntegerPicker extends NumberPicker {
         setDisplayedValues(null);
         setMaxValue(numElement - 1);
         setValue(selectedIndex);
+        setWrapSelectorWheel(wrapSelectorWheel);
         setDisplayedValues(displayValues);
     }
     public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+        this.wrapSelectorWheel = wrapSelectorWheel;
+        setMaxValue(numElement - 1);
         setWrapSelectorWheel(wrapSelectorWheel);
         setDisplayedValues(displayValues);
     }

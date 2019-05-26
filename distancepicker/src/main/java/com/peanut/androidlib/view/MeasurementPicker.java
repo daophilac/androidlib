@@ -18,6 +18,7 @@ public class MeasurementPicker extends NumberPicker {
     private String[] shortMeasurements = {Measurement.MILLIMETER.shortDisplayedValue, Measurement.CENTIMETER.shortDisplayedValue, Measurement.DECIMETER.shortDisplayedValue, Measurement.METER.shortDisplayedValue, Measurement.KILOMETER.shortDisplayedValue};
     private String[] longMeasurements = {Measurement.MILLIMETER.longDisplayedValue, Measurement.CENTIMETER.longDisplayedValue, Measurement.DECIMETER.longDisplayedValue, Measurement.METER.longDisplayedValue, Measurement.KILOMETER.longDisplayedValue};
     private int numElement;
+    private boolean wrapSelectorWheel;
     public MeasurementPicker(Context context) {
         super(context);
     }
