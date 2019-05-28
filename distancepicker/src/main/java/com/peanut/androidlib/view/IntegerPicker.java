@@ -2,7 +2,6 @@ package com.peanut.androidlib.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.NumberPicker;
 
@@ -38,11 +37,6 @@ public class IntegerPicker extends NumberPicker {
         selectedIndex = typedArray.getInt(R.styleable.IntegerPicker_selectedIndex, defSelectedIndex);
         typedArray.recycle();
         perform();
-        super.setOnValueChangedListener((picker, oldVal, newVal) -> {
-            
-            selectedIndex = newVal;
-            selectedValue = values[selectedIndex];
-        });
     }
     public IntegerPicker(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -99,22 +93,19 @@ public class IntegerPicker extends NumberPicker {
         this.baseMinValue = baseMinValue;
         return this;
     }
-
     public IntegerPicker setBaseMaxValue(int baseMaxValue) {
         this.baseMaxValue = baseMaxValue;
         return this;
     }
-
     public IntegerPicker setMultiplicationFactor(int multiplicationFactor) {
         this.multiplicationFactor = multiplicationFactor;
         return this;
     }
-
     public IntegerPicker setSelectedIndex(int selectedIndex) {
         this.selectedIndex = selectedIndex;
+        this.selectedValue = values[selectedIndex];
         return this;
     }
-
     public void setSelectedValue(int selectedValue){
         if(selectedValue % multiplicationFactor != 0){
             throw new IllegalArgumentException(String.format(INVALID_SELECTED_VALUE, selectedValue, multiplicationFactor));
@@ -126,39 +117,34 @@ public class IntegerPicker extends NumberPicker {
         this.selectedIndex = selectedValue / multiplicationFactor - baseMinValue;
         setValue(selectedIndex);
     }
-
     public void setOnValueChangeListener(OnValueChangeListener onValueChangeListener) {
-        super.setOnValueChangedListener((picker, oldVal, newVal) -> onValueChangeListener.onValueChange(IntegerPicker.this, values[oldVal], values[newVal]));
+        super.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            selectedIndex = newVal;
+            selectedValue = values[newVal];
+            onValueChangeListener.onValueChange(this, values[oldVal], selectedValue);
+        });
     }
-
     public int getBaseMinValue() {
         return baseMinValue;
     }
-
     public int getBaseMaxValue() {
         return baseMaxValue;
     }
-
     public int getMultiplicationFactor() {
         return multiplicationFactor;
     }
-
     public int getSelectedIndex() {
         return selectedIndex;
     }
-
     public int getSelectedValue() {
         return selectedValue;
     }
-
     public int getNumElement() {
         return numElement;
     }
-
     public int[] getValues() {
         return values;
     }
-
     public String[] getDisplayValues() {
         return displayValues;
     }

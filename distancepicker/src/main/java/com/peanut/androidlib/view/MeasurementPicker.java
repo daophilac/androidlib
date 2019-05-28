@@ -107,7 +107,10 @@ public class MeasurementPicker extends NumberPicker {
     }
 
     public void setOnMeasurementChangeListener(OnMeasurementChangeListener onMeasurementChangeListener) {
-        super.setOnValueChangedListener((picker, oldVal, newVal) -> onMeasurementChangeListener.onMeasurementChange(this, measurements[oldVal], measurements[newVal]));
+        super.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            measurement = measurements[newVal];
+            onMeasurementChangeListener.onMeasurementChange(this, measurements[oldVal], measurement);
+        });
     }
 
     // Getters
