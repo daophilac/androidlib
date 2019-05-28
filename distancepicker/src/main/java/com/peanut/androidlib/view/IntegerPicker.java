@@ -39,6 +39,7 @@ public class IntegerPicker extends NumberPicker {
         typedArray.recycle();
         perform();
         super.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            
             selectedIndex = newVal;
             selectedValue = values[selectedIndex];
         });
