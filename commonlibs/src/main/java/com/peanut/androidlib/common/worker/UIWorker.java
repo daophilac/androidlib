@@ -52,16 +52,14 @@ public class UIWorker extends HandlerThread {
     }
 
     public static void quitAllWorkers() {
-        for (UIWorker uiWorker : listUIWorker) {
-            uiWorker.quit();
+        while(!listUIWorker.isEmpty()){
+            listUIWorker.get(0).quit();
         }
-        listUIWorker = new ArrayList<>();
     }
 
     public static void quitAllWorkersSafely() {
-        for (UIWorker uiWorker : listUIWorker) {
-            uiWorker.quitSafely();
+        while(!listUIWorker.isEmpty()){
+            listUIWorker.get(0).quitSafely();
         }
-        listUIWorker = new ArrayList<>();
     }
 }

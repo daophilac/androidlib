@@ -95,6 +95,16 @@ public class MultipleWorker {
         this.quit = true;
         listMultipleWorker.remove(this);
     }
+    public static void quitAllWorkers(){
+        while(!listMultipleWorker.isEmpty()){
+            listMultipleWorker.get(0).quit();
+        }
+    }
+    public static void quitAllWorkersSafely(){
+        while(!listMultipleWorker.isEmpty()){
+            listMultipleWorker.get(0).quitSafely();
+        }
+    }
 
     private class SingleWorker extends HandlerThread{
         private Handler handler;

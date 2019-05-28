@@ -38,6 +38,10 @@ public class IntegerPicker extends NumberPicker {
         selectedIndex = typedArray.getInt(R.styleable.IntegerPicker_selectedIndex, defSelectedIndex);
         typedArray.recycle();
         perform();
+        super.setOnValueChangedListener((picker, oldVal, newVal) -> {
+            selectedIndex = newVal;
+            selectedValue = values[selectedIndex];
+        });
     }
     public IntegerPicker(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);

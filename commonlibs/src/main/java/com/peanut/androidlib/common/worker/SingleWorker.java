@@ -48,16 +48,15 @@ public class SingleWorker extends HandlerThread {
         return super.quitSafely();
     }
 
-    public static void quitAllWorkers(){
-        for(SingleWorker singleWorker : listSingleWorker){
-            singleWorker.quit();
+    public static void quitAllWorkers() {
+        while(!listSingleWorker.isEmpty()){
+            listSingleWorker.get(0).quit();
         }
-        listSingleWorker = new ArrayList<>();
     }
-    public static void quitAllWorkersSafely(){
-        for(SingleWorker singleWorker : listSingleWorker){
-            singleWorker.quitSafely();
+
+    public static void quitAllWorkersSafely() {
+        while(!listSingleWorker.isEmpty()){
+            listSingleWorker.get(0).quitSafely();
         }
-        listSingleWorker = new ArrayList<>();
     }
 }

@@ -40,6 +40,8 @@ public class MeasurementPicker extends NumberPicker {
         setUnitStyle(UnitStyle.newInstanceFromValue(value));
     }
     public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+        this.wrapSelectorWheel = wrapSelectorWheel;
+        setMaxValue(numElement - 1);
         setWrapSelectorWheel(wrapSelectorWheel);
         setUnitStyle(unitStyle);
     }
@@ -101,6 +103,7 @@ public class MeasurementPicker extends NumberPicker {
                 setDisplayedValues(longMeasurements);
                 break;
         }
+
     }
 
     public void setOnMeasurementChangeListener(OnMeasurementChangeListener onMeasurementChangeListener) {
