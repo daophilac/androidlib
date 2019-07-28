@@ -1,5 +1,4 @@
 package com.peanut.androidlib.sensormanager;
-
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -7,7 +6,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import java.util.List;
-
 public class ShakeDetector {
     private ShakeDetectorListener shakeDetectorListener;
     private SensorManager sensorManager;
@@ -17,13 +15,12 @@ public class ShakeDetector {
     private long minInterval;
     private float minForce;
     private boolean supported;
-    public ShakeDetector(Context context){
+    public ShakeDetector(Context context) {
         SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         List<Sensor> listSensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
-        if(listSensor.size() == 0){
+        if (listSensor.size() == 0) {
             this.supported = false;
-        }
-        else{
+        } else {
             this.supported = true;
             this.sensorManager = sensorManager;
             this.sensor = listSensor.get(0);
@@ -31,14 +28,13 @@ public class ShakeDetector {
             this.configureDefault();
         }
     }
-    public void start(ShakeDetectorListener shakeDetectorListener){
+    public void start(ShakeDetectorListener shakeDetectorListener) {
         this.shakeDetectorListener = shakeDetectorListener;
-        if(!supported){
+        if (!supported) {
             shakeDetectorListener.onNoSupportDetection();
-        }
-        else{
+        } else {
             shakeDetectorListener.onSupportDetection();
-            if(!this.running){
+            if (!this.running) {
                 this.running = true;
                 this.sensorEventListener = new SensorEventListener() {
                     private long now;
@@ -55,16 +51,15 @@ public class ShakeDetector {
                         nowX = event.values[0];
                         nowY = event.values[1];
                         nowZ = event.values[2];
-                        if(previous == 0){
+                        if (previous == 0) {
                             previous = now;
                             previousX = nowX;
                             previousY = nowY;
                             previousZ = nowZ;
-                        }
-                        else{
-                            if(now - previous > minInterval){
+                        } else {
+                            if (now - previous > minInterval) {
                                 float force = Math.abs(nowX + nowY + nowZ - previousX - previousY - previousZ);
-                                if(force > minForce){
+                                if (force > minForce) {
                                     shakeDetectorListener.onAccelerationChange(nowX, nowY, nowZ);
                                     shakeDetectorListener.onShake(force);
                                     previous = now;
@@ -75,7 +70,6 @@ public class ShakeDetector {
                             }
                         }
                     }
-
                     @Override
                     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
@@ -85,24 +79,24 @@ public class ShakeDetector {
             }
         }
     }
-    public void stop(){
-        if(this.isRunning()){
+    public void stop() {
+        if (this.isRunning()) {
             this.sensorManager.unregisterListener(this.sensorEventListener);
             this.shakeDetectorListener.onStopDetection();
         }
     }
-    private void configureDefault(){
+    private void configureDefault() {
         this.minInterval = 200;
         this.minForce = 15;
     }
-    public void configure(long minInterval, float minForce){
+    public void configure(long minInterval, float minForce) {
         this.minInterval = minInterval;
         this.minForce = minForce;
     }
-    public boolean isSupported(){
+    public boolean isSupported() {
         return supported;
     }
-    public boolean isRunning(){
+    public boolean isRunning() {
         return this.running;
     }
     public interface ShakeDetectorListener {

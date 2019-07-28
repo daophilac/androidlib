@@ -1,5 +1,4 @@
 package com.peanut.example;
-
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +11,6 @@ import android.view.Window;
 import android.widget.Button;
 
 import com.peanut.example.movingdetector.R;
-
 public class PermissionDeniedDialogFragment extends DialogFragment {
     @NonNull
     @Override
@@ -22,7 +20,6 @@ public class PermissionDeniedDialogFragment extends DialogFragment {
         setCancelable(false);
         return dialog;
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

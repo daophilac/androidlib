@@ -1,5 +1,4 @@
 package com.peanut.example;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,7 +16,6 @@ import com.peanut.androidlib.sensormanager.MovingDetector;
 import com.peanut.example.movingdetector.R;
 
 import java.util.Locale;
-
 public class MainActivity extends AppCompatActivity {
     private EditText editTextDistanceToMove;
     private TextView textViewDistanceHasMoved;
@@ -27,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStop;
     private TextView textViewFurtherDetails;
     private TextView textViewStatus;
-
     private MovingDetector.LocationDetector locationDetector;
     private float distanceToMove;
     private float distanceHasMoved;
@@ -36,14 +33,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PermissionInquirer permissionInquirer = new PermissionInquirer(this);
-        if(!permissionInquirer.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
+        if (!permissionInquirer.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             permissionInquirer.askPermission(Manifest.permission.ACCESS_FINE_LOCATION, 1);
-        }
-        else{
+        } else {
             configureDetector();
         }
     }
-    private void configureDetector(){
+    private void configureDetector() {
         locationDetector = MovingDetector.newInstance(this, new LocationTracker.LocationServiceListener() {
             @Override
             public void onLocationServiceOff() {
@@ -52,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
                 MainActivity.this.sendBroadcast(intent);
             }
-
             @Override
             public void onLocationServiceOn() {
 
@@ -63,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEnter() {
             }
-
             @Override
             public void onExit() {
                 locationDetector.requestSelfLocationSettings(1);
@@ -80,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void configureControls(){
+    private void configureControls() {
         editTextDistanceToMove = findViewById(R.id.edit_text_distance_to_move);
         textViewDistanceHasMoved = findViewById(R.id.text_view_distance_has_moved);
         buttonStart = findViewById(R.id.button_start);
@@ -91,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         textViewStatus = findViewById(R.id.text_view_status);
 
         buttonStart.setOnClickListener(v -> {
-            if(!locationDetector.isRunning()){
+            if (!locationDetector.isRunning()) {
                 locationDetector.checkLocationSetting(new LocationTracker.OnLocationSettingResultListener() {
                     @Override
                     public void onSatisfiedSetting() {
@@ -107,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                                 distanceHasMoved += distance;
                                 textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
                                 distanceToMove -= distance;
-                                if(distanceToMove <= 0){
+                                if (distanceToMove <= 0) {
                                     locationDetector.stop();
                                     textViewStatus.setTextColor(getResources().getColor(R.color.colorGreen));
                                     textViewStatus.setText(getString(R.string.done));
@@ -127,20 +121,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         buttonPause.setOnClickListener(v -> {
-            if(locationDetector.isRunning()){
+            if (locationDetector.isRunning()) {
                 locationDetector.pause();
                 textViewStatus.setText(getString(R.string.pause));
             }
         });
         buttonResume.setOnClickListener(v -> {
-            if(locationDetector.isRunning()){
+            if (locationDetector.isRunning()) {
                 locationDetector.requestSelfLocationSettings(1);
                 locationDetector.resume();
                 textViewStatus.setText(getString(R.string.tracking));
             }
         });
         buttonStop.setOnClickListener(v -> {
-            if(locationDetector.isRunning()){
+            if (locationDetector.isRunning()) {
                 locationDetector.stop();
                 textViewStatus.setTextColor(getResources().getColor(R.color.colorRed));
                 textViewStatus.setText(getString(R.string.stopped));
@@ -149,12 +143,11 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     configureDetector();
-                }
-                else{
+                } else {
                     new PermissionDeniedDialogFragment().show(getSupportFragmentManager(), this.getPackageName());
                 }
                 break;
@@ -162,17 +155,16 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     configureControls();
-                }
-                else{
+                } else {
                     new UnsatisfiedSettingDialogFragment().show(getSupportFragmentManager(), this.getPackageName());
                 }
                 break;
             case 2:
-                if(resultCode == RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     distanceToMove = Float.parseFloat(editTextDistanceToMove.getText().toString());
                     distanceHasMoved = 0;
                     textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
@@ -185,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                             distanceHasMoved += distance;
                             textViewDistanceHasMoved.setText(String.format(Locale.US, getString(R.string.distance_has_moved), distanceHasMoved));
                             distanceToMove -= distance;
-                            if(distanceToMove <= 0){
+                            if (distanceToMove <= 0) {
                                 locationDetector.stop();
                                 textViewStatus.setTextColor(getResources().getColor(R.color.colorGreen));
                                 textViewStatus.setText(getString(R.string.done));
@@ -196,8 +188,7 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                     });
-                }
-                else{
+                } else {
                     new UnsatisfiedSettingDialogFragment().show(getSupportFragmentManager(), this.getPackageName());
                 }
                 break;

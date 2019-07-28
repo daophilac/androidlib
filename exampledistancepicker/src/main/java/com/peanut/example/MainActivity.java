@@ -1,13 +1,10 @@
 package com.peanut.example;
-
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v7.app.AppCompatActivity;
 
 import com.peanut.androidlib.view.DistancePicker;
 import com.peanut.androidlib.view.IntegerPicker;
 import com.peanut.androidlib.view.MeasurementPicker;
-
 public class MainActivity extends AppCompatActivity {
     private DistancePicker distancePicker;
     private MeasurementPicker measurementPicker;

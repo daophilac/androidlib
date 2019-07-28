@@ -1,11 +1,10 @@
 package com.peanut.example;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -16,7 +15,6 @@ import com.peanut.example.folderpicker.R;
 
 import java.util.Arrays;
 import java.util.HashMap;
-
 public class FolderPickerActivity extends AppCompatActivity {
     private Button buttonOpenPicker;
     private FolderPicker folderPicker;
@@ -40,25 +38,22 @@ public class FolderPickerActivity extends AppCompatActivity {
         this.buttonOpenPicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
+                if (permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     folderPicker.openFolderPicker();
-                }
-                else{
+                } else {
                     permissionInquirer.askPermission(Manifest.permission.READ_EXTERNAL_STORAGE, 1);
                 }
             }
         });
     }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
+        switch (requestCode) {
             case 1:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     folderPicker.openFolderPicker();
-                }
-                else{
+                } else {
                     Toast.makeText(this, "Read external permission has not been granted.", Toast.LENGTH_LONG).show();
                 }
                 break;

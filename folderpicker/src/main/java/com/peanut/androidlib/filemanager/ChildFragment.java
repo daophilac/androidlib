@@ -1,5 +1,4 @@
 package com.peanut.androidlib.filemanager;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import com.peanut.androidlib.common.worker.MultipleWorker;
 
 import java.io.File;
-
 public class ChildFragment extends Fragment {
     private static final String IS_NOT_OPENED_FROM_FOLDER_PICKER = "You should use the class FolderPicker and its openFolderPicker method. Avoid directly creating and using an instance of ChildFragment like this.";
     private Context context;
@@ -28,7 +26,6 @@ public class ChildFragment extends Fragment {
     private File parentDirectory;
     private File startingDirectory;
     private Boolean isSelectedAll;
-
     private ConstraintLayout constraintLayoutOperation;
     private ImageButton imageButtonBack;
     private TextView textViewFolderName;
@@ -37,9 +34,8 @@ public class ChildFragment extends Fragment {
     private FolderAdapter folderAdapter;
     private FolderPicker.ParentMode parentMode;
     private MultipleWorker multipleWorker;
-
     private boolean isOpenedFromFolderPicker;
-    void configure(FolderPicker folderPicker, FragmentManager fragmentManager, File parentDirectory, File startingDirectory, Boolean isSelectedAll){
+    void configure(FolderPicker folderPicker, FragmentManager fragmentManager, File parentDirectory, File startingDirectory, Boolean isSelectedAll) {
         this.isOpenedFromFolderPicker = true;
         this.fragmentManager = fragmentManager;
         this.folderPicker = folderPicker;
@@ -56,20 +52,18 @@ public class ChildFragment extends Fragment {
 //            }
 //        });
     }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(!this.isOpenedFromFolderPicker){
+        if (!this.isOpenedFromFolderPicker) {
             throw new IllegalStateException(IS_NOT_OPENED_FROM_FOLDER_PICKER);
         }
         this.context = context;
     }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        switch(this.parentMode){
+        switch (this.parentMode) {
             case FULL_DIRECTORY:
                 this.textViewFolderName.setText(this.parentDirectory.getPath());
                 break;
@@ -83,7 +77,6 @@ public class ChildFragment extends Fragment {
                 break;
         }
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -99,7 +92,7 @@ public class ChildFragment extends Fragment {
         this.recyclerViewListFile.setBackgroundColor(this.folderPicker.getBodyColor());
         this.constraintLayoutOperation.setBackgroundColor(this.folderPicker.getNavigationBarColor());
 
-        switch(this.parentMode){
+        switch (this.parentMode) {
             case FULL_DIRECTORY:
                 this.textViewFolderName.setText(this.startingDirectory.getPath());
                 break;

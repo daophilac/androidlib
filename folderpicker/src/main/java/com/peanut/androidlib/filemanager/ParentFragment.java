@@ -1,5 +1,4 @@
 package com.peanut.androidlib.filemanager;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,12 +11,11 @@ import android.widget.Button;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 public class ParentFragment extends Fragment {
     private Button buttonCancel;
     private Button buttonOk;
     private List<FolderPickerListener> listListener;
-    public void registerListener(FolderPickerListener folderPickerListener){
+    public void registerListener(FolderPickerListener folderPickerListener) {
         this.listListener.add(folderPickerListener);
     }
     @Nullable
@@ -31,18 +29,17 @@ public class ParentFragment extends Fragment {
         this.buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(FolderPickerListener listener : listListener){
+                for (FolderPickerListener listener : listListener) {
                     listener.onCancel();
                 }
-                for(Fragment fragment : getFragmentManager().getFragments()){
+                for (Fragment fragment : getFragmentManager().getFragments()) {
                     getFragmentManager().beginTransaction().remove(fragment).commit();
                 }
             }
         });
         return view;
     }
-
-    public interface FolderPickerListener{
+    public interface FolderPickerListener {
         void onCancel();
         List<File> onOk();
     }

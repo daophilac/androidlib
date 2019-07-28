@@ -1,5 +1,4 @@
 package com.peanut.androidlib.activitymanager;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +6,6 @@ import android.os.Bundle;
 
 import java.util.HashMap;
 import java.util.Map;
-
-
 class SoulSummoner extends BroadcastReceiver {
     private static Class activityClass;
     private static SoulSummonerListener soulSummonerListener;
@@ -16,21 +13,22 @@ class SoulSummoner extends BroadcastReceiver {
     private static State state;
     private Incantation incantation;
     private Thread threadReviver;
-    public SoulSummoner(){}
-    public static void setActivityClass(Class activityClass){
+    public SoulSummoner() {
+    }
+    public static void setActivityClass(Class activityClass) {
         SoulSummoner.activityClass = activityClass;
     }
-    public static void setMapBundleActivity(HashMap<String, Bundle> mapBundleActivity){
+    public static void setMapBundleActivity(HashMap<String, Bundle> mapBundleActivity) {
         SoulSummoner.mapBundleActivity = mapBundleActivity;
     }
-    public static HashMap<String, Bundle> getMapBundleActivity(){
+    public static HashMap<String, Bundle> getMapBundleActivity() {
         return SoulSummoner.mapBundleActivity;
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(intent.getAction().equals(ActivitySignal.ON_STOP.value)){
+        if (intent.getAction().equals(ActivitySignal.ON_STOP.value)) {
             state = State.ON_STOP;
-            if(soulSummonerListener == null){
+            if (soulSummonerListener == null) {
                 Intent intentRevive = new Intent(context, activityClass);
                 for (Map.Entry<String, Bundle> pair : mapBundleActivity.entrySet()) {
                     intentRevive.putExtra(pair.getKey(), pair.getValue());
@@ -41,11 +39,10 @@ class SoulSummoner extends BroadcastReceiver {
                 this.threadReviver = new Thread(incantation);
                 this.threadReviver.start();
             }
-        }
-        else if(intent.getAction().equals(ActivitySignal.ON_RESUME.value)){
-            if(state == State.ON_STOP){
+        } else if (intent.getAction().equals(ActivitySignal.ON_RESUME.value)) {
+            if (state == State.ON_STOP) {
                 // Safely stop the reviver;
-                if(soulSummonerListener != null){
+                if (soulSummonerListener != null) {
                     soulSummonerListener.onStop();
                     state = State.DONE;
                     soulSummonerListener = null;
@@ -61,14 +58,14 @@ class SoulSummoner extends BroadcastReceiver {
         private Context context;
         private Intent intent;
         private boolean stop;
-        private Incantation(Context context, Intent intent){
+        private Incantation(Context context, Intent intent) {
             this.context = context;
             this.intent = intent;
             this.stop = false;
         }
         @Override
         public void run() {
-            while(!stop){
+            while (!stop) {
                 context.startActivity(intent);
                 try {
                     Thread.sleep(1000);
@@ -81,16 +78,15 @@ class SoulSummoner extends BroadcastReceiver {
     private interface SoulSummonerListener {
         void onStop();
     }
-    private enum State{
+    private enum State {
         ON_STOP, DONE
     }
-    enum ActivitySignal{
+    enum ActivitySignal {
         ON_STOP("onStop"), ON_RESUME("onResume");
         private final String value;
-        ActivitySignal(String value){
+        ActivitySignal(String value) {
             this.value = value;
         }
-
         public String getValue() {
             return value;
         }

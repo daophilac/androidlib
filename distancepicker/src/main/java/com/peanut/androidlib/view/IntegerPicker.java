@@ -1,10 +1,8 @@
 package com.peanut.androidlib.view;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.NumberPicker;
-
 public class IntegerPicker extends NumberPicker {
     private static final String MAX_SMALLER_THAN_MIN = "baseMaxValue cannot be smaller than baseMinValue. baseMaxValue=%d, baseMinValue=%d";
     private static final String NEGATIVE_SELECTED_INDEX = "selectedIndex cannot be negative";
@@ -41,27 +39,27 @@ public class IntegerPicker extends NumberPicker {
     public IntegerPicker(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
-    private void validateValues(){
-        if(baseMaxValue < baseMinValue){
+    private void validateValues() {
+        if (baseMaxValue < baseMinValue) {
             throw new IllegalArgumentException(String.format(MAX_SMALLER_THAN_MIN, baseMaxValue, baseMinValue));
         }
-        if(selectedIndex < 0){
+        if (selectedIndex < 0) {
             throw new IllegalArgumentException(NEGATIVE_SELECTED_INDEX);
         }
         numElement = baseMaxValue - baseMinValue + 1;
         // TODO
-        if(numElement > 5000){
+        if (numElement > 5000) {
             throw new RuntimeException("There are many elements");
         }
-        if(selectedIndex >= numElement){
+        if (selectedIndex >= numElement) {
             throw new IllegalArgumentException(String.format(OUT_OF_RANGE_SELECTED_INDEX, selectedIndex, numElement));
         }
     }
-    private void generateDisplayedValues(){
+    private void generateDisplayedValues() {
         values = new int[numElement];
         displayValues = new String[numElement];
         selectedValue = values[selectedIndex];
-        for(int i = 0, value = (i + baseMinValue) * multiplicationFactor; i < numElement; i++, value += multiplicationFactor){
+        for (int i = 0, value = (i + baseMinValue) * multiplicationFactor; i < numElement; i++, value += multiplicationFactor) {
             values[i] = value;
             displayValues[i] = String.valueOf(value);
         }
@@ -71,18 +69,18 @@ public class IntegerPicker extends NumberPicker {
         setWrapSelectorWheel(wrapSelectorWheel);
         setDisplayedValues(displayValues);
     }
-    public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+    public void updateWrapSelectorWheel(boolean wrapSelectorWheel) {
         this.wrapSelectorWheel = wrapSelectorWheel;
         setMaxValue(numElement - 1);
         setWrapSelectorWheel(wrapSelectorWheel);
         setDisplayedValues(displayValues);
     }
-    public void perform(){
+    public void perform() {
         validateValues();
         generateDisplayedValues();
     }
-    public boolean scroll(int scroll){
-        if(selectedIndex + scroll < 0 || selectedIndex + scroll >= numElement){
+    public boolean scroll(int scroll) {
+        if (selectedIndex + scroll < 0 || selectedIndex + scroll >= numElement) {
             return false;
         }
         selectedIndex += scroll;
@@ -106,11 +104,11 @@ public class IntegerPicker extends NumberPicker {
         this.selectedValue = values[selectedIndex];
         return this;
     }
-    public void setSelectedValue(int selectedValue){
-        if(selectedValue % multiplicationFactor != 0){
+    public void setSelectedValue(int selectedValue) {
+        if (selectedValue % multiplicationFactor != 0) {
             throw new IllegalArgumentException(String.format(INVALID_SELECTED_VALUE, selectedValue, multiplicationFactor));
         }
-        if(selectedValue > values[numElement - 1]){
+        if (selectedValue > values[numElement - 1]) {
             throw new IllegalArgumentException(String.format(SELECTED_VALUE_GREATER_THAN_MAX, selectedValue, values[numElement - 1]));
         }
         this.selectedValue = selectedValue;

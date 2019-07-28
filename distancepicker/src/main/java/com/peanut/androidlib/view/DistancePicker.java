@@ -1,5 +1,4 @@
 package com.peanut.androidlib.view;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
@@ -9,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-
 public class DistancePicker extends LinearLayout {
     private MeasurementPicker measurementPicker;
     private IntegerPicker integerPicker;
@@ -29,127 +27,104 @@ public class DistancePicker extends LinearLayout {
         integerPicker.perform();
         typedArray.recycle();
     }
-
     public DistancePicker(Context context, @NonNull AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initializeViews(context);
     }
-    private void initializeViews(Context context){
+    private void initializeViews(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.distance_picker_view, this);
         measurementPicker = view.findViewById(R.id.measurement_picker);
         integerPicker = view.findViewById(R.id.multiply_number_picker);
     }
-
-    public void updateWrapSelectorWheel(boolean wrapSelectorWheel){
+    public void updateWrapSelectorWheel(boolean wrapSelectorWheel) {
         measurementPicker.updateWrapSelectorWheel(wrapSelectorWheel);
         integerPicker.updateWrapSelectorWheel(wrapSelectorWheel);
     }
-    public void perform(){
+    public void perform() {
         integerPicker.perform();
     }
-    public boolean scroll(int scroll){
+    public boolean scroll(int scroll) {
         return integerPicker.scroll(scroll);
     }
     public void setUnitStyle(MeasurementPicker.UnitStyle unitStyle) {
         measurementPicker.setUnitStyle(unitStyle);
     }
-    public void setSelectedMeasurementIndex(int selectedIndex){
+    public void setSelectedMeasurementIndex(int selectedIndex) {
         measurementPicker.setSelectedIndex(selectedIndex);
     }
-    public boolean setMeasurement(MeasurementPicker.Measurement measurement){
+    public boolean setMeasurement(MeasurementPicker.Measurement measurement) {
         return measurementPicker.setMeasurement(measurement);
     }
-
     public void setMeasurements(MeasurementPicker.Measurement[] measurements) {
         measurementPicker.setMeasurements(measurements);
     }
-
     public DistancePicker setBaseMinValue(int baseMinValue) {
         integerPicker.setBaseMinValue(baseMinValue);
         return this;
     }
-
     public DistancePicker setBaseMaxValue(int baseMaxValue) {
         integerPicker.setBaseMaxValue(baseMaxValue);
         return this;
     }
-
     public DistancePicker setMultiplicationFactor(int multiplicationFactor) {
         integerPicker.setMultiplicationFactor(multiplicationFactor);
         return this;
     }
-
     public DistancePicker setSelectedValueIndex(int selectedIndex) {
         integerPicker.setSelectedIndex(selectedIndex);
         return this;
     }
-
-    public void setSelectedValue(int selectedValue){
+    public void setSelectedValue(int selectedValue) {
         integerPicker.setSelectedValue(selectedValue);
     }
-
     public void setOnMeasurementChangeListener(MeasurementPicker.OnMeasurementChangeListener onMeasurementChangeListener) {
         measurementPicker.setOnMeasurementChangeListener(onMeasurementChangeListener);
     }
-
     public void setOnValueChangeListener(NumberPicker.OnValueChangeListener onValueChangeListener) {
         integerPicker.setOnValueChangeListener(onValueChangeListener);
     }
     public MeasurementPicker.UnitStyle getUnitStyle() {
         return measurementPicker.getUnitStyle();
     }
-
     public MeasurementPicker.Measurement getMeasurement() {
         return measurementPicker.getMeasurement();
     }
-
     public MeasurementPicker.Measurement[] getMeasurements() {
         return measurementPicker.getMeasurements();
     }
-
     public String[] getShortMeasurements() {
         return measurementPicker.getShortMeasurements();
     }
-
     public String[] getLongMeasurements() {
         return measurementPicker.getLongMeasurements();
     }
     public int getBaseMinValue() {
         return integerPicker.getBaseMinValue();
     }
-
     public int getBaseMaxValue() {
         return integerPicker.getBaseMaxValue();
     }
-
     public int getMultiplicationFactor() {
         return integerPicker.getMultiplicationFactor();
     }
-
     public int getSelectedIndex() {
         return integerPicker.getSelectedIndex();
     }
-
-    public int getSelectedValue(){
+    public int getSelectedValue() {
         return integerPicker.getSelectedValue();
     }
-
     public int getNumElement() {
         return integerPicker.getNumElement();
     }
-
     public int[] getValues() {
         return integerPicker.getValues();
     }
-
     public String[] getDisplayValues() {
         return integerPicker.getDisplayValues();
     }
-
     public MeasurementPicker getMeasurementPicker() {
         return measurementPicker;
     }
-
     public IntegerPicker getIntegerPicker() {
         return integerPicker;
     }

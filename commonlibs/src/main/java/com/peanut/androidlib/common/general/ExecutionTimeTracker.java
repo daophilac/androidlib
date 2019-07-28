@@ -1,7 +1,5 @@
 package com.peanut.androidlib.common.general;
-
 import java.util.Calendar;
-
 public class ExecutionTimeTracker {
     private static final String ALREADY_STARTED = "Tracker has already started.";
     private static final String ALREADY_STOPPED = "Tracker has already stopped.";
@@ -13,17 +11,17 @@ public class ExecutionTimeTracker {
     private boolean stopped;
     private boolean running;
     private boolean canGetTime;
-    public ExecutionTimeTracker(){
+    public ExecutionTimeTracker() {
         this.started = false;
         this.stopped = true;
         this.running = false;
         this.canGetTime = false;
     }
-    public void startTracking(){
-        if(this.started){
+    public void startTracking() {
+        if (this.started) {
             throw new IllegalStateException(ALREADY_STARTED);
         }
-        if(this.running && !this.stopped){
+        if (this.running && !this.stopped) {
             throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
         }
         this.beforeMillisecond = Calendar.getInstance().getTimeInMillis();
@@ -32,11 +30,11 @@ public class ExecutionTimeTracker {
         this.running = true;
         this.canGetTime = false;
     }
-    public void stopTracking(){
-        if(!this.started){
+    public void stopTracking() {
+        if (!this.started) {
             throw new IllegalStateException(HAVE_NOT_STARTED_YET);
         }
-        if(this.stopped){
+        if (this.stopped) {
             throw new IllegalStateException(ALREADY_STOPPED);
         }
         this.afterMillisecond = Calendar.getInstance().getTimeInMillis();
@@ -45,34 +43,31 @@ public class ExecutionTimeTracker {
         this.running = false;
         this.canGetTime = true;
     }
-
     public long getBeforeMillisecond() {
-        if(!this.canGetTime){
-            if(!this.started){
+        if (!this.canGetTime) {
+            if (!this.started) {
                 throw new IllegalStateException(HAVE_NOT_STARTED_YET);
             }
         }
         return this.beforeMillisecond;
     }
-
     public long getAfterMillisecond() {
-        if(!this.canGetTime){
-            if(!this.started){
+        if (!this.canGetTime) {
+            if (!this.started) {
                 throw new IllegalStateException(HAVE_NOT_STARTED_YET);
             }
-            if(!this.stopped){
+            if (!this.stopped) {
                 throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
             }
         }
         return this.afterMillisecond;
     }
-
-    public long getExecutionTime(){
-        if(!this.canGetTime){
-            if(!this.started){
+    public long getExecutionTime() {
+        if (!this.canGetTime) {
+            if (!this.started) {
                 throw new IllegalStateException(HAVE_NOT_STARTED_YET);
             }
-            if(!this.stopped){
+            if (!this.stopped) {
                 throw new IllegalStateException(HAVE_NOT_STOPPED_YET);
             }
         }

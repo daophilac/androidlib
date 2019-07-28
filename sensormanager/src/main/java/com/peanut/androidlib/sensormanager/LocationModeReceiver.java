@@ -1,5 +1,4 @@
 package com.peanut.androidlib.sensormanager;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +6,6 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.Build;
 import android.provider.Settings;
-
 class LocationModeReceiver extends BroadcastReceiver {
     private Context context;
     private IntentFilter intentFilter;
@@ -18,136 +16,128 @@ class LocationModeReceiver extends BroadcastReceiver {
     private LocationManager locationManager;
     private boolean locationServiceIsOn;
     private boolean running;
-    LocationModeReceiver(Context context, LocationTracker.LocationServiceListener locationServiceListener, IntentFilter intentFilter){
+    LocationModeReceiver(Context context, LocationTracker.LocationServiceListener locationServiceListener, IntentFilter intentFilter) {
         this.context = context;
         this.intentFilter = intentFilter;
         this.locationServiceListener = locationServiceListener;
         this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
     }
-    void start(){
+    void start() {
         running = true;
         context.registerReceiver(this, intentFilter);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             locationServiceIsOn = locationManager.isLocationEnabled();
-        }
-        else{
+        } else {
             int serviceMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
             locationServiceIsOn = serviceMode != Settings.Secure.LOCATION_MODE_OFF;
         }
     }
-    void resume(){
+    void resume() {
         running = true;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             locationServiceIsOn = locationManager.isLocationEnabled();
-        }
-        else{
+        } else {
             int serviceMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
             locationServiceIsOn = serviceMode != Settings.Secure.LOCATION_MODE_OFF;
         }
     }
-    void pause(){
+    void pause() {
         running = false;
     }
-    void stop(){
+    void stop() {
         unregisterListeners();
         context.unregisterReceiver(this);
         running = false;
     }
     @Override
     public void onReceive(Context context, Intent intent) {
-        if(LocationManager.MODE_CHANGED_ACTION.equals(intent.getAction())){
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
-                if(locationManager.isLocationEnabled()){
-                    if(!locationServiceIsOn){
+        if (LocationManager.MODE_CHANGED_ACTION.equals(intent.getAction())) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (locationManager.isLocationEnabled()) {
+                    if (!locationServiceIsOn) {
                         locationServiceIsOn = true;
                         locationServiceListener.onLocationServiceOn();
                         resume();
                     }
-                }
-                else{
-                    if(!running){
+                } else {
+                    if (!running) {
                         return;
                     }
-                    if(locationServiceIsOn){
+                    if (locationServiceIsOn) {
                         locationServiceIsOn = false;
                         locationServiceListener.onLocationServiceOff();
                         pause();
                     }
                 }
-            }
-            else{
+            } else {
                 int serviceMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
-                if(serviceMode != Settings.Secure.LOCATION_MODE_OFF){
-                    if(!locationServiceIsOn){
+                if (serviceMode != Settings.Secure.LOCATION_MODE_OFF) {
+                    if (!locationServiceIsOn) {
                         locationServiceIsOn = true;
                         locationServiceListener.onLocationServiceOn();
                         resume();
                     }
-                }
-                else{
-                    if(!running){
+                } else {
+                    if (!running) {
                         return;
                     }
-                    if(locationServiceIsOn){
+                    if (locationServiceIsOn) {
                         locationServiceIsOn = false;
                         locationServiceListener.onLocationServiceOff();
                         pause();
                     }
                 }
-                if(!locationServiceIsOn){
+                if (!locationServiceIsOn) {
                     return;
                 }
-                if(highAccuracyModeListener != null){
+                if (highAccuracyModeListener != null) {
                     int highAccuracyMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_HIGH_ACCURACY);
-                    if(highAccuracyMode == Settings.Secure.LOCATION_MODE_HIGH_ACCURACY){
+                    if (highAccuracyMode == Settings.Secure.LOCATION_MODE_HIGH_ACCURACY) {
                         highAccuracyModeListener.onEnter();
-                    }
-                    else{
+                    } else {
                         highAccuracyModeListener.onExit();
                     }
                 }
-                if(batterySavingModeListener != null){
+                if (batterySavingModeListener != null) {
                     int batterSavingMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_BATTERY_SAVING);
-                    if(batterSavingMode == Settings.Secure.LOCATION_MODE_BATTERY_SAVING){
+                    if (batterSavingMode == Settings.Secure.LOCATION_MODE_BATTERY_SAVING) {
                         batterySavingModeListener.onEnter();
-                    }
-                    else{
+                    } else {
                         batterySavingModeListener.onExit();
                     }
                 }
-                if(sensorOnlyModeListener != null){
+                if (sensorOnlyModeListener != null) {
                     int sensorOnlyMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_SENSORS_ONLY);
-                    if(sensorOnlyMode == Settings.Secure.LOCATION_MODE_SENSORS_ONLY){
+                    if (sensorOnlyMode == Settings.Secure.LOCATION_MODE_SENSORS_ONLY) {
                         sensorOnlyModeListener.onEnter();
-                    }
-                    else{
+                    } else {
                         sensorOnlyModeListener.onExit();
                     }
                 }
             }
         }
     }
-    void unregisterListeners(){
+    void unregisterListeners() {
         unregisterActionOnHighAccuracyMode();
         unregisterActionOnBatterySavingMode();
         unregisterActionOnSensorOnlyMode();
     }
-    void registerActionOnHighAccuracyMode(LocationTracker.HighAccuracyModeListener highAccuracyModeListener){
+    void registerActionOnHighAccuracyMode(LocationTracker.HighAccuracyModeListener highAccuracyModeListener) {
         this.highAccuracyModeListener = highAccuracyModeListener;
     }
-    void registerActionOnBatterySavingMode(LocationTracker.BatterySavingModeListener batterySavingModeListener){
+    void registerActionOnBatterySavingMode(LocationTracker.BatterySavingModeListener batterySavingModeListener) {
         this.batterySavingModeListener = batterySavingModeListener;
     }
-    void registerActionOnSensorOnlyMode(LocationTracker.SensorOnlyModeListener sensorOnlyModeListener){
+    void registerActionOnSensorOnlyMode(LocationTracker.SensorOnlyModeListener sensorOnlyModeListener) {
         this.sensorOnlyModeListener = sensorOnlyModeListener;
     }
-    void unregisterActionOnHighAccuracyMode(){
+    void unregisterActionOnHighAccuracyMode() {
         this.highAccuracyModeListener = null;
     }
-    void unregisterActionOnBatterySavingMode(){
+    void unregisterActionOnBatterySavingMode() {
         this.batterySavingModeListener = null;
     }
-    void unregisterActionOnSensorOnlyMode(){
+    void unregisterActionOnSensorOnlyMode() {
         this.sensorOnlyModeListener = null;
     }
 }
