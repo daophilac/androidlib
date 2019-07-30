@@ -1,6 +1,6 @@
 package com.peanut.example;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.peanut.androidlib.view.DistancePicker;
 import com.peanut.androidlib.view.IntegerPicker;

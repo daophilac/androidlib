@@ -1,4 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peanut.androidlib.sensormanager" >
-    <uses-permission android:name="android.permission.VIBRATE"/>
-</manifest>
+    package="com.peanut.androidlib.sensormanager" />
