@@ -24,7 +24,6 @@ public class Downloader {
     private static int defaultDeleteFailDelay = 1000;
     private static int maxDownloaderCount = 10000;
     private String saveDirectory;
-    private Context context;
     private SingleWorker singleWorker;
     private long updateInterval = 1000;
 
@@ -43,26 +42,14 @@ public class Downloader {
     private Timer timerUpdater;
     private Timer timerSpeedCalculator;
     private DownloaderListener downloaderListener;
-    public Downloader(Context context, String saveDirectory, String downloadUrl, String fileName, boolean override){
-        if(context == null){
-            throw new IllegalArgumentException("context cannot be null.");
-        }
+    public Downloader(String saveDirectory, String downloadUrl, String fileName, boolean override){
         if(saveDirectory == null){
             throw new IllegalArgumentException("saveDirectory cannot be null.");
         }
         if(downloadUrl == null){
             throw new IllegalArgumentException("downloadUrl cannot be null.");
         }
-        PermissionInquirer permissionInquirer = new PermissionInquirer(context);
-        if(!permissionInquirer.checkPermission(Manifest.permission.INTERNET)){
-            throw new RuntimeException("INTERNET permission has not been granted.");
-        }
-        if(!permissionInquirer.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)){
-            throw new RuntimeException("WRITE EXTERNAL STORAGE permission has not been granted.");
-        }
-
         setSaveDirectory(saveDirectory);
-        this.context = context;
         this.downloadUrl = downloadUrl;
         this.fileName = fileName;
         this.override = override;

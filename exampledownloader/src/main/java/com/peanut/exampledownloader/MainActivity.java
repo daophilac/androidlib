@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void initializeDownloader(){
-        downloader = new Downloader(this, "/sdcard/download", editTextUrl.getText().toString(), "file.zip", true);
+        downloader = new Downloader("/sdcard/download", editTextUrl.getText().toString(), "file.zip", true);
         downloader.setUpdateInterval(500);
         downloader.setDownloaderListener(new Downloader.DownloaderListener() {
             @Override
