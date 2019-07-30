@@ -32,11 +32,11 @@ public class Downloader {
     private String fileName;
     private String fileType;
     private String filePath;
+    private int fileSize;
+    private boolean override;
+    private boolean resumable;
     private File file;
     private FileOutputStream fileOutputStream;
-    private boolean override;
-    private int fileSize;
-    private boolean resumable;
     private int currentTotalBytes;
     private int speed;
     private State state;
@@ -337,12 +337,6 @@ public class Downloader {
     public static int getDefaultRangeRequestSize() {
         return defaultRangeRequestSize;
     }
-    public long getUpdateInterval() {
-        return updateInterval;
-    }
-    public void setUpdateInterval(long updateInterval) {
-        this.updateInterval = updateInterval;
-    }
     public static void setDefaultRangeRequestSize(int defaultRangeRequestSize) {
         Downloader.defaultRangeRequestSize = defaultRangeRequestSize;
     }
@@ -364,6 +358,12 @@ public class Downloader {
     public static void setMaxDownloaderCount(int maxDownloaderCount) {
         Downloader.maxDownloaderCount = maxDownloaderCount;
     }
+    public long getUpdateInterval() {
+        return updateInterval;
+    }
+    public void setUpdateInterval(long updateInterval) {
+        this.updateInterval = updateInterval;
+    }
     public String getDownloadUrl() {
         return downloadUrl;
     }
@@ -376,17 +376,14 @@ public class Downloader {
     public String getFilePath() {
         return filePath;
     }
-    public boolean isOverride() {
-        return override;
-    }
     public int getFileSize() {
         return fileSize;
     }
+    public boolean isOverride() {
+        return override;
+    }
     public boolean isResumable() {
         return resumable;
-    }
-    public int getCurrentTotalBytes() {
-        return currentTotalBytes;
     }
     public int getSpeed() {
         return speed;
