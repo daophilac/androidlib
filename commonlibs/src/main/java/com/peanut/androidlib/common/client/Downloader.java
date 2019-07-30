@@ -80,60 +80,58 @@ public class Downloader {
             return;
         }
         state = State.Preparing;
-        singleWorker.execute(() -> {
-            try {
-                URL url = new URL(downloadUrl);
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + 100);
-                if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_PARTIAL){
-                    resumable = true;
-                    fileSize = Integer.parseInt(httpURLConnection.getHeaderField("Content-Range").split("/")[1]);
+        try {
+            URL url = new URL(downloadUrl);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + 100);
+            if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_PARTIAL){
+                resumable = true;
+                fileSize = Integer.parseInt(httpURLConnection.getHeaderField("Content-Range").split("/")[1]);
+            }
+            else if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+                resumable = false;
+                fileSize = httpURLConnection.getContentLength();
+            }
+            else{
+                if(downloaderListener != null){
+                    downloaderListener.onFailure("Error connection with status code: " + httpURLConnection.getResponseCode());
                 }
-                else if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
-                    resumable = false;
-                    fileSize = httpURLConnection.getContentLength();
-                }
-                else{
-                    if(downloaderListener != null){
-                        downloaderListener.onFailure("Error connection with status code: " + httpURLConnection.getResponseCode());
-                    }
-                    state = State.Failure;
+                state = State.Failure;
+                return;
+            }
+            String contentDisposition = httpURLConnection.getHeaderField("Content-Disposition");
+            fileType = httpURLConnection.getHeaderField("Content-Type");
+            if(fileName == null){
+                fileName = contentDisposition.split("; ")[1].split("=")[1];
+            }
+            filePath = saveDirectory + "/" + fileName;
+            filePath = filePath.replace("//", "/");
+            downloaderListener.onPrepared();
+            file = new File(filePath);
+            if(!isOverride()){
+                if(file.exists()){
+                    state = State.AlreadyDownloaded;
                     return;
                 }
-                String contentDisposition = httpURLConnection.getHeaderField("Content-Disposition");
-                fileType = httpURLConnection.getHeaderField("Content-Type");
-                if(fileName == null){
-                    fileName = contentDisposition.split("; ")[1].split("=")[1];
-                }
-                filePath = saveDirectory + "/" + fileName;
-                filePath = filePath.replace("//", "/");
-                downloaderListener.onPrepared();
-                file = new File(filePath);
-                if(!isOverride()){
-                    if(file.exists()){
-                        state = State.AlreadyDownloaded;
-                        return;
-                    }
-                }
-                file = new File(saveDirectory);
+            }
+            file = new File(saveDirectory);
+            if(!file.exists()){
+                file.getParentFile().mkdirs();
+            }
+            file = new File(filePath);
+            try {
                 if(!file.exists()){
-                    file.getParentFile().mkdirs();
+                    file.createNewFile();
                 }
-                file = new File(filePath);
-                try {
-                    if(!file.exists()){
-                        file.createNewFile();
-                    }
-                    fileOutputStream = new FileOutputStream(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                state = State.Prepared;
+                fileOutputStream = new FileOutputStream(file);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+            state = State.Prepared;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     public void start(){
         if(downloaderListener == null){
