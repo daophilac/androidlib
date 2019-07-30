@@ -43,4 +43,11 @@ public class PermissionInquirer {
     public boolean checkPermission(String permission) {
         return ContextCompat.checkSelfPermission(this.context, permission) == PackageManager.PERMISSION_GRANTED;
     }
+    public boolean[] checkPermission(String[] permissions){
+        boolean[] grantResults = new boolean[permissions.length];
+        for(int i = 0; i < permissions.length; i++){
+            grantResults[i] = ContextCompat.checkSelfPermission(this.context, permissions[i]) == PackageManager.PERMISSION_GRANTED;
+        }
+        return grantResults;
+    }
 }
