@@ -10,7 +10,7 @@
         android:id="@+id/edit_text_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="http://10.88.54.150/sv/api/user/testdownload"
+        android:text="http://192.168.2.113/sv/api/user/testdownload"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -28,11 +28,11 @@
         app:layout_constraintTop_toBottomOf="@id/text_view_percent" />
 
     <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_view_speed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/text_view_speed"
-        app:layout_constraintTop_toBottomOf="@id/text_view_bytes"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_bytes" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_start"
@@ -69,5 +69,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/button_resume"
         app:layout_constraintTop_toBottomOf="@id/text_view_speed" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_re_download"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Re-download"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_start" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

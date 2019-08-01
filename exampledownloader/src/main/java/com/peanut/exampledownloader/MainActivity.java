@@ -12,6 +12,8 @@ import android.widget.Toast;
 
 import com.peanut.androidlib.common.client.Downloader;
 import com.peanut.androidlib.common.permissionmanager.PermissionInquirer;
+
+import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     private EditText editTextUrl;
     private TextView textViewPercent;
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonPause;
     private Button buttonResume;
     private Button buttonCancel;
+    private Button buttonReDownload;
     private Downloader downloader;
     private PermissionInquirer permissionInquirer;
     private int fileSize;
@@ -36,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         buttonPause = findViewById(R.id.button_pause);
         buttonResume = findViewById(R.id.button_resume);
         buttonCancel = findViewById(R.id.button_cancel);
+        buttonReDownload = findViewById(R.id.button_re_download);
         permissionInquirer = new PermissionInquirer(this);
         if(Build.VERSION.SDK_INT >= 23){
             if(permissionInquirer.checkPermission(Manifest.permission.INTERNET) && permissionInquirer.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) && permissionInquirer.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE)){
@@ -62,52 +66,31 @@ public class MainActivity extends AppCompatActivity {
     private void initializeDownloader(){
         downloader = new Downloader("/sdcard/download", editTextUrl.getText().toString(), "file.zip", true);
         downloader.setUpdateInterval(500);
-        downloader.setDownloaderListener(new Downloader.DownloaderListener() {
-            @Override
-            public void onPrepared() {
-                fileSize = downloader.getFileSize();
-                Toast.makeText(MainActivity.this, "On Prepared!", Toast.LENGTH_LONG).show();
+        downloader.setOnDoneListener(() -> Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show());
+        downloader.setOnPauseListener(() -> Toast.makeText(this, "Pause!", Toast.LENGTH_LONG).show());
+        downloader.setOnDownloadListener(() -> Toast.makeText(this, "Downloading!", Toast.LENGTH_LONG).show());
+        downloader.setOnCancelListener(() -> Toast.makeText(this, "Cancel!", Toast.LENGTH_LONG).show());
+        downloader.setOnHttpFailListener(httpURLConnection -> {
+            try {
+                Toast.makeText(this, String.valueOf(httpURLConnection.getResponseCode()), Toast.LENGTH_LONG).show();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            @Override
-            public void onPause() {
-                Toast.makeText(MainActivity.this, "On Pause!", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onResume() {
-                Toast.makeText(MainActivity.this, "On Resume!", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onFinish() {
-                Toast.makeText(MainActivity.this, "Finished!", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onCancel() {
-                Toast.makeText(MainActivity.this, "On Cancel!", Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void onUpdatePercent(float percent) {
-                runOnUiThread(() -> {
-                    textViewPercent.setText("Percent: " + percent * 100 + "%");
-                    float speed = downloader.getSpeed() / 1024 / 1024f;
-                    textViewSpeed.setText("Speed: " + speed + "MB/s");
-                });
-            }
-            @Override
-            public void onUpdateBytes(long bytes) {
-                runOnUiThread(() -> {
-                    textViewBytes.setText("Bytes: " + bytes + "/" + fileSize);
-                });
-            }
-            @Override
-            public void onFailure(String message) {
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
-            }
+        });
+        downloader.setOnExceptionListener(e -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show());
+        downloader.setOnUpdateProgressListener((percent, currentTotalByte) -> {
+            runOnUiThread(() -> textViewPercent.setText("Percent: " + percent * 100 + "%"));
+        });
+        downloader.setOnUpdateSpeedListener(s -> {
+            runOnUiThread(() -> {
+                float speed = s / 1024 / 1024f;
+                textViewSpeed.setText("Speed: " + speed + " MB/s");
+            });
         });
         buttonPause.setOnClickListener(v -> downloader.pause());
         buttonResume.setOnClickListener(v -> downloader.resume());
         buttonCancel.setOnClickListener(v -> downloader.cancel(true));
-        buttonStart.setOnClickListener(v -> {
-            downloader.start();
-        });
+        buttonStart.setOnClickListener(v -> downloader.start());
+        buttonReDownload.setOnClickListener(v -> downloader.reDownload());
     }
 }

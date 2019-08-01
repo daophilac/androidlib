@@ -1,8 +1,4 @@
 package com.peanut.androidlib.common.client;
-import android.Manifest;
-import android.content.Context;
-
-import com.peanut.androidlib.common.permissionmanager.PermissionInquirer;
 import com.peanut.androidlib.common.worker.SingleWorker;
 
 import java.io.DataInputStream;
@@ -11,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +39,14 @@ public class Downloader {
     private State state;
     private Timer timerUpdater;
     private Timer timerSpeedCalculator;
-    private DownloaderListener downloaderListener;
+    private OnDownloadListener onDownloadListener;
+    private OnDoneListener onDoneListener;
+    private OnPauseListener onPauseListener;
+    private OnCancelListener onCancelListener;
+    private OnUpdateProgressListener onUpdateProgressListener;
+    private OnUpdateSpeedListener onUpdateSpeedListener;
+    private OnHttpFailListener onHttpFailListener;
+    private OnExceptionListener onExceptionListener;
     public Downloader(String saveDirectory, String downloadUrl, String fileName, boolean override){
         if(saveDirectory == null){
             throw new IllegalArgumentException("saveDirectory cannot be null.");
@@ -73,9 +78,6 @@ public class Downloader {
         downloaderConcurrentLinkedQueue.addAll(list);
     }
     private void prepare(){
-        if(downloaderListener == null){
-            throw new RuntimeException("downloaderListener is null. Please set this listener first.");
-        }
         if(state != State.Initial){
             return;
         }
@@ -84,7 +86,7 @@ public class Downloader {
             URL url = new URL(downloadUrl);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + 100);
+            httpURLConnection.setRequestProperty("Range", "bytes=0-100");
             if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_PARTIAL){
                 resumable = true;
                 fileSize = Integer.parseInt(httpURLConnection.getHeaderField("Content-Range").split("/")[1]);
@@ -94,10 +96,10 @@ public class Downloader {
                 fileSize = httpURLConnection.getContentLength();
             }
             else{
-                if(downloaderListener != null){
-                    downloaderListener.onFailure("Error connection with status code: " + httpURLConnection.getResponseCode());
-                }
                 state = State.Failure;
+                if(onHttpFailListener != null){
+                    onHttpFailListener.onHttpFail(httpURLConnection);
+                }
                 return;
             }
             String contentDisposition = httpURLConnection.getHeaderField("Content-Disposition");
@@ -107,7 +109,6 @@ public class Downloader {
             }
             filePath = saveDirectory + "/" + fileName;
             filePath = filePath.replace("//", "/");
-            downloaderListener.onPrepared();
             file = new File(filePath);
             if(!isOverride()){
                 if(file.exists()){
@@ -128,15 +129,13 @@ public class Downloader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            currentTotalBytes = 0;
             state = State.Prepared;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     public void start(){
-        if(downloaderListener == null){
-            throw new RuntimeException("downloaderListener is null. Please set this listener first.");
-        }
         if(state != State.Initial){
             return;
         }
@@ -144,19 +143,21 @@ public class Downloader {
         singleWorker.execute(this::enterDownloadingState);
     }
     private void runTimers(){
-        timerUpdater = new Timer();
-        timerSpeedCalculator = new Timer();
-        TimerTask timerTaskUpdater = new TimerTask() {
-            @Override
-            public void run() {
-                float percent = (float) currentTotalBytes / fileSize;
-                downloaderListener.onUpdatePercent(percent);
-                downloaderListener.onUpdateBytes(currentTotalBytes);
-                if(state == State.Done || state == State.Pausing || state == State.Cancel){
-                    timerUpdater.cancel();
+        if(onUpdateProgressListener != null){
+            timerUpdater = new Timer();
+            TimerTask timerTaskUpdater = new TimerTask() {
+                @Override
+                public void run() {
+                    float percent = (float) currentTotalBytes / fileSize;
+                    onUpdateProgressListener.onUpdateProgress(percent, currentTotalBytes);
+                    if(state == State.Done || state == State.Pausing || state == State.Cancel){
+                        timerUpdater.cancel();
+                    }
                 }
-            }
-        };
+            };
+            timerUpdater.schedule(timerTaskUpdater, 0, updateInterval);
+        }
+        timerSpeedCalculator = new Timer();
         TimerTask timerTaskSpeedCalculator = new TimerTask() {
             private int nowBytes = currentTotalBytes;
             @Override
@@ -167,9 +168,11 @@ public class Downloader {
                     speed = 0;
                     timerSpeedCalculator.cancel();
                 }
+                if(onUpdateSpeedListener != null){
+                    onUpdateSpeedListener.onUpdateSpeed(speed);
+                }
             }
         };
-        timerUpdater.schedule(timerTaskUpdater, 0, updateInterval);
         timerSpeedCalculator.schedule(timerTaskSpeedCalculator, 0, 1000);
     }
     private void enterDownloadingState(){
@@ -191,6 +194,9 @@ public class Downloader {
     }
     private void resumableDownload(){
         // TODO: Check reusable HttpURLConnection;
+        if(onDownloadListener != null){
+            onDownloadListener.onDownload();
+        }
         try{
             while(state == State.Downloading){
                 URL url = new URL(downloadUrl);
@@ -199,7 +205,9 @@ public class Downloader {
                 httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + (currentTotalBytes + defaultRangeRequestSize));
                 if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_PARTIAL){
                     state = State.Failure;
-                    downloaderListener.onFailure("Error connection with status code: " + httpURLConnection.getResponseCode());
+                    if(onHttpFailListener != null){
+                        onHttpFailListener.onHttpFail(httpURLConnection);
+                    }
                     return;
                 }
                 else{
@@ -217,25 +225,42 @@ public class Downloader {
                 if(currentTotalBytes >= fileSize){
                     fileOutputStream.close();
                     state = State.Done;
-                    downloaderListener.onFinish();
+                    if(onDoneListener != null){
+                        onDoneListener.onDone();
+                    }
                     return;
                 }
             }
-        } catch(IOException e){
-            state = State.Failure;
-            downloaderListener.onFailure("Exception: " + e.getMessage());
-            return;
+        } catch (ProtocolException e) {
+            state = State.Exception;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
+        } catch (MalformedURLException e) {
+            state = State.Exception;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
+        } catch (IOException e) {
+            state = State.Exception;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
         }
     }
     private void nonResumableDownload(){
+        if(onDownloadListener != null){
+            onDownloadListener.onDownload();
+        }
         try{
             URL url = new URL(downloadUrl);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setRequestMethod("GET");
             if(httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK){
                 state = State.Failure;
-                downloaderListener.onFailure("Error connection with status code: " + httpURLConnection.getResponseCode());
-                return;
+                if(onHttpFailListener != null){
+                    onHttpFailListener.onHttpFail(httpURLConnection);
+                }
             }
             else{
                 InputStream inputStream = httpURLConnection.getInputStream();
@@ -248,22 +273,37 @@ public class Downloader {
                     if(currentTotalBytes >= fileSize){
                         fileOutputStream.close();
                         state = State.Done;
-                        downloaderListener.onFinish();
+                        if(onDoneListener != null){
+                            onDoneListener.onDone();
+                        }
                         break;
                     }
                     if(state == State.Cancel){
                         fileOutputStream.close();
-                        downloaderListener.onCancel();
+                        if(onCancelListener != null){
+                            onCancelListener.onCancel();
+                        }
                         break;
                     }
                 }
                 dataInputStream.close();
                 inputStream.close();
             }
-        } catch(IOException e){
+        } catch (ProtocolException e) {
             state = State.Failure;
-            downloaderListener.onFailure("Exception: " + e.getMessage());
-            return;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
+        } catch (MalformedURLException e) {
+            state = State.Failure;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
+        } catch (IOException e) {
+            state = State.Failure;
+            if(onExceptionListener != null){
+                onExceptionListener.onException(e);
+            }
         }
     }
     public void pause(){
@@ -274,41 +314,57 @@ public class Downloader {
             return;
         }
         state = State.Pausing;
-        downloaderListener.onPause();
+        if(onPauseListener != null){
+            onPauseListener.onPause();
+        }
     }
     public void resume(){
         if(state == State.Pausing){
             singleWorker.execute(this::enterDownloadingState);
-            downloaderListener.onResume();
         }
     }
     public void cancel(boolean deleteFile){
-        if(state == State.Downloading || state == State.Pausing){
+        if(state == State.Downloading || state == State.Pausing) {
             state = State.Cancel;
             if(deleteFile){
                 file.delete();
             }
-            downloaderListener.onCancel();
+            if(onCancelListener != null){
+                onCancelListener.onCancel();
+            }
         }
+    }
+    public void reDownload(){
+        cancel(false);
+        state = State.Initial;
+        start();
     }
     public enum State{
-        Initial, Preparing, Prepared, Downloading, Pausing, Done, Cancel, AlreadyDownloaded, Failure
+        Initial, Preparing, Prepared, Downloading, Pausing, Done, Cancel, AlreadyDownloaded, Failure, Exception
     }
-    public interface DownloaderListener {
-        void onPrepared();
+    public interface OnDownloadListener{
+        void onDownload();
+    }
+    public interface OnDoneListener{
+        void onDone();
+    }
+    public interface OnPauseListener{
         void onPause();
-        void onResume();
-        void onFinish();
-        void onCancel();
-        void onUpdatePercent(float percent);
-        void onUpdateBytes(long bytes);
-        void onFailure(String message);
     }
-    public void setDownloaderListener(DownloaderListener downloaderListener) {
-        if(this.downloaderListener != null){
-            throw new IllegalStateException("downloaderListener has already been set.");
-        }
-        this.downloaderListener = downloaderListener;
+    public interface OnCancelListener{
+        void onCancel();
+    }
+    public interface OnUpdateProgressListener{
+        void onUpdateProgress(float percent, int currentTotalByte);
+    }
+    public interface OnUpdateSpeedListener{
+        void onUpdateSpeed(int speed);
+    }
+    public interface OnHttpFailListener{
+        void onHttpFail(HttpURLConnection httpURLConnection);
+    }
+    public interface OnExceptionListener{
+        void onException(Exception e);
     }
     public String getSaveDirectory() {
         return saveDirectory;
@@ -375,5 +431,37 @@ public class Downloader {
     }
     public State getState() {
         return state;
+    }
+    public Downloader setOnDownloadListener(OnDownloadListener onDownloadListener) {
+        this.onDownloadListener = onDownloadListener;
+        return this;
+    }
+    public Downloader setOnDoneListener(OnDoneListener onDoneListener) {
+        this.onDoneListener = onDoneListener;
+        return this;
+    }
+    public Downloader setOnPauseListener(OnPauseListener onPauseListener) {
+        this.onPauseListener = onPauseListener;
+        return this;
+    }
+    public Downloader setOnCancelListener(OnCancelListener onCancelListener) {
+        this.onCancelListener = onCancelListener;
+        return this;
+    }
+    public Downloader setOnUpdateProgressListener(OnUpdateProgressListener onUpdateProgressListener) {
+        this.onUpdateProgressListener = onUpdateProgressListener;
+        return this;
+    }
+    public Downloader setOnUpdateSpeedListener(OnUpdateSpeedListener onUpdateSpeedListener) {
+        this.onUpdateSpeedListener = onUpdateSpeedListener;
+        return this;
+    }
+    public Downloader setOnHttpFailListener(OnHttpFailListener onHttpFailListener) {
+        this.onHttpFailListener = onHttpFailListener;
+        return this;
+    }
+    public Downloader setOnExceptionListener(OnExceptionListener onExceptionListener) {
+        this.onExceptionListener = onExceptionListener;
+        return this;
     }
 }
