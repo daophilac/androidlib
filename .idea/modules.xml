@@ -10,6 +10,7 @@
       <module fileurl="file://$PROJECT_DIR$/exampledownloader/exampledownloader.iml" filepath="$PROJECT_DIR$/exampledownloader/exampledownloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/examplefolderpicker/examplefolderpicker.iml" filepath="$PROJECT_DIR$/examplefolderpicker/examplefolderpicker.iml" />
       <module fileurl="file://$PROJECT_DIR$/examplemovingdetector/examplemovingdetector.iml" filepath="$PROJECT_DIR$/examplemovingdetector/examplemovingdetector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/exampleuploader/exampleuploader.iml" filepath="$PROJECT_DIR$/exampleuploader/exampleuploader.iml" />
       <module fileurl="file://$PROJECT_DIR$/folderpicker/folderpicker.iml" filepath="$PROJECT_DIR$/folderpicker/folderpicker.iml" />
       <module fileurl="file://$PROJECT_DIR$/sensormanager/sensormanager.iml" filepath="$PROJECT_DIR$/sensormanager/sensormanager.iml" />
     </modules>

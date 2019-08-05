@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textViewPercent;
     private TextView textViewBytes;
     private TextView textViewSpeed;
+    private TextView textViewEstimated;
     private Button buttonStart;
     private Button buttonPause;
     private Button buttonResume;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         textViewPercent = findViewById(R.id.text_view_percent);
         textViewBytes = findViewById(R.id.text_view_bytes);
         textViewSpeed = findViewById(R.id.text_view_speed);
+        textViewEstimated = findViewById(R.id.text_view_estimated);
         buttonStart = findViewById(R.id.button_start);
         buttonPause = findViewById(R.id.button_pause);
         buttonResume = findViewById(R.id.button_resume);
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private void initializeDownloader(){
         downloader = new Downloader("/sdcard/download", editTextUrl.getText().toString(), "file.zip", true);
         downloader.setUpdateInterval(500);
+        downloader.setOnPrepareListener(() -> Toast.makeText(this, "Preparing!", Toast.LENGTH_LONG).show());
         downloader.setOnDoneListener(() -> Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show());
         downloader.setOnPauseListener(() -> Toast.makeText(this, "Pause!", Toast.LENGTH_LONG).show());
         downloader.setOnDownloadListener(() -> Toast.makeText(this, "Downloading!", Toast.LENGTH_LONG).show());
@@ -78,13 +81,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         downloader.setOnExceptionListener(e -> Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show());
-        downloader.setOnUpdateProgressListener((percent, currentTotalByte) -> {
+        downloader.setOnUpdateProgressListener((percent, currentTotalBytes) -> {
             runOnUiThread(() -> textViewPercent.setText("Percent: " + percent * 100 + "%"));
         });
-        downloader.setOnUpdateSpeedListener(s -> {
+        downloader.setOnUpdateSpeedListener((s, e) -> {
             runOnUiThread(() -> {
                 float speed = s / 1024 / 1024f;
                 textViewSpeed.setText("Speed: " + speed + " MB/s");
+                textViewEstimated.setText("Estimated: " + e + " seconds");
             });
         });
         buttonPause.setOnClickListener(v -> downloader.pause());

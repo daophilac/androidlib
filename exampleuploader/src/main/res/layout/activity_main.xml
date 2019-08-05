@@ -6,22 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.AppCompatEditText
-        android:id="@+id/edit_text_url"
-        android:layout_width="match_parent"
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_view_file_path"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="http://localhost:55555/api/user/testdownload"
+        android:text="File path"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/edit_text_file_path"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="/sdcard/e.zip"
+        app:layout_constraintBaseline_toBaselineOf="@id/text_view_file_path"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/text_view_file_path" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_view_percent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text_url" />
+        app:layout_constraintTop_toBottomOf="@id/edit_text_file_path" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/text_view_bytes"
+        android:id="@+id/text_view_uploaded"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_bytes" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_uploaded" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/text_view_estimated"
@@ -41,23 +51,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_view_speed" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/text_view_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_view_estimated" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="START"
-        app:layout_constraintEnd_toStartOf="@id/button_pause"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_view_estimated" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_status" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="PAUSE"
-        app:layout_constraintEnd_toEndOf="@id/button_resume"
+        app:layout_constraintEnd_toStartOf="@id/button_resume"
         app:layout_constraintStart_toEndOf="@id/button_start"
-        app:layout_constraintTop_toBottomOf="@id/text_view_estimated" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_status" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_resume"
@@ -66,7 +82,7 @@
         android:text="RESUME"
         app:layout_constraintEnd_toStartOf="@id/button_cancel"
         app:layout_constraintStart_toEndOf="@id/button_pause"
-        app:layout_constraintTop_toBottomOf="@id/text_view_estimated" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_status" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/button_cancel"
@@ -75,13 +91,13 @@
         android:text="CANCEL"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/button_resume"
-        app:layout_constraintTop_toBottomOf="@id/text_view_estimated" />
+        app:layout_constraintTop_toBottomOf="@id/text_view_status" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/button_re_download"
+        android:id="@+id/button_re_upload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Re-download"
+        android:text="RE-UPLOAD"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_start" />
