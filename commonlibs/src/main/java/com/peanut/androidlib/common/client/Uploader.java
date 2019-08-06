@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,12 +35,40 @@ public class Uploader {
     }
     //endregion
     //region public properties
+    private String uploadUrl;
+    public String getUploadUrl() {
+        return uploadUrl;
+    }
+    public void setUploadUrl(String uploadUrl) {
+        if (uploadUrl == null) {
+            throw new IllegalArgumentException("uploadUrl cannot be null.");
+        }
+        this.uploadUrl = uploadUrl;
+    }
+    private String filePath;
+    public String getFilePath() {
+        return filePath;
+    }
+    public void setFilePath(String filePath) {
+        if (filePath == null) {
+            throw new IllegalArgumentException("filePath cannot be null.");
+        }
+        File file = new File(filePath);
+        if (!file.exists()) {
+            throw new IllegalArgumentException("File not found.");
+        }
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("it's not a file path, it looks more like a directory.");
+        }
+        this.filePath = filePath;
+        this.file = file;
+    }
     private int bufferSize = 81920;
     public int getBufferSize() {
         return bufferSize;
     }
     public void setBufferSize(int bufferSize) {
-        if(bufferSize < 4096){
+        if (bufferSize < 4096) {
             throw new IllegalArgumentException("bufferSize must be equal or greater than 4096.");
         }
         this.bufferSize = bufferSize;
@@ -51,7 +78,7 @@ public class Uploader {
         return updateInterval;
     }
     public void setUpdateInterval(long updateInterval) {
-        if(updateInterval <= 0){
+        if (updateInterval <= 0) {
             throw new IllegalArgumentException("bufferSize must be a positive number.");
         }
         this.updateInterval = updateInterval;
@@ -61,14 +88,6 @@ public class Uploader {
     private State state;
     public State getState() {
         return state;
-    }
-    private String uploadUrl;
-    public String getUploadUrl() {
-        return uploadUrl;
-    }
-    private String filePath;
-    public String getFilePath() {
-        return filePath;
     }
     private String fileName;
     public String getFileName() {
@@ -130,28 +149,22 @@ public class Uploader {
     private OnExceptionListener onExceptionListener;
     //endregion
     //region constructors
-    public Uploader(String uploadUrl, String filePath) {
-        this.uploadUrl = uploadUrl;
-        try {
-            url = new URL(uploadUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException("Malformed URL detected.");
-        }
-        File file = new File(filePath);
-        if (!file.exists()) {
-            throw new IllegalArgumentException("File not found.");
-        }
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("it's not a file path, it looks more like a directory.");
-        }
-        this.file = file;
-        this.filePath = filePath;
-        initializeGlobalVariables();
+    public Uploader() {
+        boundary = UUID.randomUUID().toString();
+        singleWorker = new SingleWorker();
         uploaders.add(this);
-        if(uploaders.size() > maxUploaderCount){
+        if (uploaders.size() > maxUploaderCount) {
             refreshUploaderList();
         }
         state = State.Initial;
+    }
+    public Uploader(String uploadUrl) {
+        this();
+        setUploadUrl(uploadUrl);
+    }
+    public Uploader(String uploadUrl, String filePath) {
+        this(uploadUrl);
+        setFilePath(filePath);
     }
     //endregion
     //region public methods
@@ -162,33 +175,32 @@ public class Uploader {
         singleWorker.execute(this::prepare);
         singleWorker.execute(this::enterUploadingState);
     }
-    public void pause(){
+    public void pause() {
         if (state != State.Uploading) {
             return;
         }
         state = State.Pausing;
         triggerOnPauseEvent();
     }
-    public void resume(){
+    public void resume() {
         if (state == State.Pausing) {
             state = State.Uploading;
             triggerOnUploadEvent();
             countDownLatch.countDown();
         }
     }
-    public void cancel(){
-        if (state == State.Uploading){
+    public void cancel() {
+        if (state == State.Uploading) {
             state = State.Cancel;
             triggerOnCancelEvent();
-        }
-        else if(state == State.Pausing){
+        } else if (state == State.Pausing) {
             state = State.Cancel;
             triggerOnCancelEvent();
             countDownLatch.countDown();
         }
     }
-    public void reUpload(){
-        if(state == State.Initial || state == State.Preparing || state == State.Prepared || state == State.Uploading){
+    public void reUpload() {
+        if (state == State.Initial || state == State.Preparing || state == State.Prepared || state == State.Uploading) {
             return;
         }
         cancel();
@@ -200,18 +212,34 @@ public class Uploader {
     private void prepare() {
         state = State.Preparing;
         triggerOnPrepareEvent();
+        fileName = file.getName();
+        fileSize = file.length();
+        int dotIndex = fileName.lastIndexOf(".");
+        fileExtension = dotIndex == -1 ? "" : fileName.substring(dotIndex + 1);
+        fileExtension = fileExtension.toLowerCase();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        mimeType = mimeTypeMap.getMimeTypeFromExtension(fileExtension);
+        mimeType = mimeType == null ? "unknown" : mimeType;
+        contentType = "multipart/form-data; boundary=\"" + boundary + "\"";
+        contentDisposition = "form-data; name=\"\"; filename=\"" + fileName + "\"";
+        startingContentWrapper = twoHyphens + boundary + lineFeed +
+                "Content-Disposition: " + contentDisposition + lineFeed +
+                "Content-Type: " + mimeType + lineFeed + lineFeed;
+        endingContentWrapper = lineFeed + twoHyphens + boundary + twoHyphens + lineFeed;
+        contentLength = fileSize + startingContentWrapper.length() + endingContentWrapper.length();
         try {
+            url = new URL(uploadUrl);
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setDoOutput(true);
             httpURLConnection.connect();
             int responseCode = httpURLConnection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_NOT_FOUND || responseCode == HttpURLConnection.HTTP_BAD_GATEWAY){
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND || responseCode == HttpURLConnection.HTTP_BAD_GATEWAY) {
                 state = State.HttpFail;
                 triggerOnHttpFailEvent();
                 return;
             }
-            if(!isBigRequestAllowed()){
-                if(state == State.Exception){
+            if (!isBigRequestAllowed()) {
+                if (state == State.Exception) {
                     return;
                 }
                 state = State.HttpFail;
@@ -237,15 +265,15 @@ public class Uploader {
             triggerOnExceptionEvent(e);
         }
     }
-    private void enterUploadingState(){
-        if(state != State.Prepared && state != State.Pausing){
+    private void enterUploadingState() {
+        if (state != State.Prepared && state != State.Pausing) {
             return;
         }
         state = State.Uploading;
         runTimers();
         upload();
     }
-    private void upload(){
+    private void upload() {
         triggerOnUploadEvent();
         try {
             fileInputStream = new FileInputStream(file); // TODO check timeout on big requests
@@ -259,26 +287,26 @@ public class Uploader {
             bufferSize = Math.min(byteAvailable, this.bufferSize);
             buffer = new byte[bufferSize];
             bytesRead = fileInputStream.read(buffer);
-            while(bytesRead > 0){
+            while (bytesRead > 0) {
                 dataOutputStream.write(buffer, 0, bytesRead);
                 dataOutputStream.flush();
                 currentTotalBytes += bytesRead;
-                if(state == State.Pausing){
+                if (state == State.Pausing) {
                     countDownLatch = new CountDownLatch(1);
                     try {
                         countDownLatch.await();
-                        if(state == State.Uploading){
+                        if (state == State.Uploading) {
                             runTimers();
-                        }
-                        else if(state == State.Cancel || state == State.Initial){
+                        } else if (state == State.Cancel || state == State.Initial) {
                             dataOutputStream.close();
                             fileInputStream.close();
                             httpURLConnection.disconnect();
                             return;
                         }
-                    } catch (InterruptedException ignored) { }
+                    } catch (InterruptedException ignored) {
+                    }
                 }
-                if(state == State.Cancel){
+                if (state == State.Cancel) {
                     dataOutputStream.close();
                     fileInputStream.close();
                     httpURLConnection.disconnect();
@@ -293,24 +321,23 @@ public class Uploader {
             dataOutputStream.flush();
             dataOutputStream.close();
             fileInputStream.close();
-            if(httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK){
+            if (httpURLConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 state = State.Done;
                 triggerOnDoneEvent();
-            }
-            else{
+            } else {
                 state = State.HttpFail;
                 triggerOnHttpFailEvent();
             }
         } catch (FileNotFoundException e) {
             triggerOnExceptionEvent(e);
         } catch (IOException e) {
-            if(state == State.Cancel || state == State.Initial){
+            if (state == State.Cancel || state == State.Initial) {
                 return;
             }
             triggerOnExceptionEvent(e);
         }
     }
-    private boolean isBigRequestAllowed(){
+    private boolean isBigRequestAllowed() {
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setDoOutput(true);
@@ -327,8 +354,8 @@ public class Uploader {
             return false;
         }
     }
-    private void runTimers(){
-        if(timerUpdater != null){
+    private void runTimers() {
+        if (timerUpdater != null) {
             timerUpdater.cancel();
             timerSpeedCalculator.cancel();
         }
@@ -368,107 +395,88 @@ public class Uploader {
         timerUpdater.schedule(timerTaskUpdater, 0, updateInterval);
         timerSpeedCalculator.schedule(timerTaskSpeedCalculator, 0, 1000);
     }
-    private void initializeGlobalVariables(){
-        fileName = file.getName();
-        fileSize = file.length();
-        boundary = UUID.randomUUID().toString();
-        int dotIndex = fileName.lastIndexOf(".");
-        fileExtension = dotIndex == -1 ? "" : fileName.substring(dotIndex + 1);
-        fileExtension = fileExtension.toLowerCase();
-        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
-        mimeType = mimeTypeMap.getMimeTypeFromExtension(fileExtension);
-        mimeType = mimeType == null ? "unknown" : mimeType;
-        contentType = "multipart/form-data; boundary=\"" + boundary + "\"";
-        contentDisposition = "form-data; name=\"\"; filename=\"" + fileName + "\"";
-        startingContentWrapper = twoHyphens + boundary + lineFeed +
-                "Content-Disposition: " + contentDisposition + lineFeed +
-                "Content-Type: " + mimeType + lineFeed + lineFeed;
-        endingContentWrapper = lineFeed + twoHyphens + boundary + twoHyphens + lineFeed;
-        contentLength = fileSize + startingContentWrapper.length() + endingContentWrapper.length();
-        singleWorker = new SingleWorker();
-    }
-    private void triggerOnPrepareEvent(){
+    private void triggerOnPrepareEvent() {
         if (onPrepareListener != null) {
             onPrepareListener.onPrepare();
         }
     }
-    private void triggerOnUploadEvent(){
-        if(onUploadListener != null){
+    private void triggerOnUploadEvent() {
+        if (onUploadListener != null) {
             onUploadListener.onUpload();
         }
     }
-    private void triggerOnDoneEvent(){
-        if(onDoneListener != null){
+    private void triggerOnDoneEvent() {
+        if (onDoneListener != null) {
             onDoneListener.onDone();
         }
     }
-    private void triggerOnPauseEvent(){
+    private void triggerOnPauseEvent() {
         if (onPauseListener != null) {
             onPauseListener.onPause();
         }
     }
-    private void triggerOnCancelEvent(){
+    private void triggerOnCancelEvent() {
         if (onCancelListener != null) {
             onCancelListener.onCancel();
         }
     }
-    private void triggerOnUpdateProgressEvent(float percent){
-        if(onUpdateProgressListener != null){
+    private void triggerOnUpdateProgressEvent(float percent) {
+        if (onUpdateProgressListener != null) {
             onUpdateProgressListener.onUpdateProgress(percent, currentTotalBytes);
         }
     }
-    private void triggerOnUpdateSpeedEvent(){
+    private void triggerOnUpdateSpeedEvent() {
         if (onUpdateSpeedListener != null) {
             onUpdateSpeedListener.onUpdateSpeed(speed, estimatedTime);
         }
     }
-    private void triggerOnHttpFailEvent(){
-        if(onHttpFailListener != null){
+    private void triggerOnHttpFailEvent() {
+        if (onHttpFailListener != null) {
             onHttpFailListener.onHttpFail(httpURLConnection);
         }
     }
-    private void triggerOnExceptionEvent(Exception e){
-        if(onExceptionListener != null){
+    private void triggerOnExceptionEvent(Exception e) {
+        if (onExceptionListener != null) {
             onExceptionListener.onException(e);
         }
     }
     //endregion
     //region public static methods
-    public static void startUploaders(Uploader[] uploaders){
-        for(Uploader uploader : uploaders){
+    public static void startUploaders(Uploader[] uploaders) {
+        for (Uploader uploader : uploaders) {
             Uploader.uploaders.add(uploader);
             uploader.start();
         }
     }
-    public static void startAll(){
-        for(Uploader uploader : uploaders){
+    public static void startAll() {
+        for (Uploader uploader : uploaders) {
             uploader.start();
         }
     }
-    public static void pauseAll(){
-        for(Uploader uploader : uploaders){
+    public static void pauseAll() {
+        for (Uploader uploader : uploaders) {
             uploader.pause();
         }
     }
-    public static void resumeAll(){
-        for(Uploader uploader : uploaders){
+    public static void resumeAll() {
+        for (Uploader uploader : uploaders) {
             uploader.resume();
         }
     }
-    public static void cancelAll(){
-        for(Uploader uploader : uploaders){
+    public static void cancelAll() {
+        for (Uploader uploader : uploaders) {
             uploader.cancel();
         }
         uploaders.clear();
     }
-    public static void reUploadAll(){
-        for(Uploader uploader : uploaders){
+    public static void reUploadAll() {
+        for (Uploader uploader : uploaders) {
             uploader.reUpload();
         }
     }
     //endregion
     //region private static methods
-    private static void refreshUploaderList(){
+    private static void refreshUploaderList() {
         List<Uploader> list = new ArrayList<>();
         for (Uploader u : uploaders) {
             if (u.state != State.Done && u.state != State.Cancel && u.state != State.HttpFail) {
@@ -538,7 +546,6 @@ public class Uploader {
     }
     public interface OnUpdateSpeedListener {
         /**
-         *
          * @param speed
          * @param estimatedTime Estimated time in seconds
          */

@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void initializeDownloader(){
-        downloader = new Downloader("/sdcard/download", editTextUrl.getText().toString(), "file.zip", true);
+        downloader = new Downloader();
         downloader.setUpdateInterval(500);
         downloader.setOnPrepareListener(() -> Toast.makeText(this, "Preparing!", Toast.LENGTH_LONG).show());
         downloader.setOnDoneListener(() -> Toast.makeText(this, "Done!", Toast.LENGTH_LONG).show());
@@ -94,7 +94,12 @@ public class MainActivity extends AppCompatActivity {
         buttonPause.setOnClickListener(v -> downloader.pause());
         buttonResume.setOnClickListener(v -> downloader.resume());
         buttonCancel.setOnClickListener(v -> downloader.cancel(true));
-        buttonStart.setOnClickListener(v -> downloader.start());
+        buttonStart.setOnClickListener(v -> {
+            downloader.setDownloadUrl(editTextUrl.getText().toString());
+            downloader.setSaveDirectory("/sdcard/download");
+            downloader.setOverride(true);
+            downloader.start();
+        });
         buttonReDownload.setOnClickListener(v -> downloader.reDownload());
     }
 }

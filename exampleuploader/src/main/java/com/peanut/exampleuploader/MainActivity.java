@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     private void initializeUploader(){
-        uploader = new Uploader("http://10.0.2.2:55555/api/user/testupload", editTextFilePath.getText().toString());
+        uploader = new Uploader();
         uploader.setOnPrepareListener(() -> {
             runOnUiThread(() -> textViewStatus.setText("Preparing"));
         }).setOnDoneListener(() -> {
@@ -100,7 +100,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     private void configureViews(){
-        buttonStart.setOnClickListener(v -> uploader.start());
+        buttonStart.setOnClickListener(v -> {
+            uploader.setUploadUrl("http://10.0.2.2:55555/api/user/testupload");
+            uploader.setFilePath(editTextFilePath.getText().toString());
+            uploader.start();
+        });
         buttonPause.setOnClickListener(v -> uploader.pause());
         buttonResume.setOnClickListener(v -> uploader.resume());
         buttonCancel.setOnClickListener(v -> uploader.cancel());

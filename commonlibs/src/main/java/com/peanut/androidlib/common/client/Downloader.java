@@ -54,12 +54,22 @@ public class Downloader {
     }
     //endregion
     //region public properties
+    private String downloadUrl;
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+    public void setDownloadUrl(String downloadUrl) {
+        if (downloadUrl == null) {
+            throw new IllegalArgumentException("downloadUrl cannot be null.");
+        }
+        this.downloadUrl = downloadUrl;
+    }
     private String saveDirectory;
     public String getSaveDirectory() {
         return saveDirectory;
     }
     public void setSaveDirectory(String saveDirectory) {
-        if(saveDirectory == null){
+        if (saveDirectory == null) {
             throw new IllegalArgumentException("saveDirectory cannot be null.");
         }
         File file = new File(saveDirectory);
@@ -70,12 +80,29 @@ public class Downloader {
         }
         this.saveDirectory = saveDirectory;
     }
+    private String fileName;
+    public String getFileName() {
+        return fileName;
+    }
+    public void setFileName(String fileName) {
+        if (fileName == null) {
+            throw new IllegalArgumentException("fileName cannot be null.");
+        }
+        this.fileName = fileName;
+    }
+    private boolean override;
+    public boolean isOverride() {
+        return override;
+    }
+    public void setOverride(boolean override) {
+        this.override = override;
+    }
     private int bufferSize = 4096;
     public int getBufferSize() {
         return bufferSize;
     }
     public void setBufferSize(int bufferSize) {
-        if(bufferSize < 4096){
+        if (bufferSize < 4096) {
             throw new IllegalArgumentException("bufferSize must be equal or bigger than 4096.");
         }
         this.bufferSize = bufferSize;
@@ -85,21 +112,13 @@ public class Downloader {
         return updateInterval;
     }
     public void setUpdateInterval(long updateInterval) {
-        if(updateInterval <= 0){
+        if (updateInterval <= 0) {
             throw new IllegalArgumentException("updateInterval must be a positive number.");
         }
         this.updateInterval = updateInterval;
     }
     //endregion
     //region public read-only properties
-    private String downloadUrl;
-    public String getDownloadUrl() {
-        return downloadUrl;
-    }
-    private String fileName;
-    public String getFileName() {
-        return fileName;
-    }
     private String fileExtension;
     public String getFileExtension() {
         return fileExtension;
@@ -115,10 +134,6 @@ public class Downloader {
     private int fileSize;
     public int getFileSize() {
         return fileSize;
-    }
-    private boolean override;
-    public boolean isOverride() {
-        return override;
     }
     private boolean resumable;
     public boolean isResumable() {
@@ -159,17 +174,7 @@ public class Downloader {
     private OnExceptionListener onExceptionListener;
     //endregion
     //region constructors
-    public Downloader(String saveDirectory, String downloadUrl, String fileName, boolean override) {
-        if (saveDirectory == null) {
-            throw new IllegalArgumentException("saveDirectory cannot be null.");
-        }
-        if (downloadUrl == null) {
-            throw new IllegalArgumentException("downloadUrl cannot be null.");
-        }
-        setSaveDirectory(saveDirectory);
-        this.downloadUrl = downloadUrl;
-        this.fileName = fileName;
-        this.override = override;
+    public Downloader() {
         rangeSize = defaultRangeRequestSize;
         singleWorker = new SingleWorker();
         downloaders.add(this);
@@ -177,6 +182,18 @@ public class Downloader {
             refresherDownloaderList();
         }
         state = State.Initial;
+    }
+    public Downloader(String downloadUrl) {
+        this();
+        setDownloadUrl(downloadUrl);
+    }
+    public Downloader(String downloadUrl, String saveDirectory) {
+        this(downloadUrl);
+        setSaveDirectory(saveDirectory);
+    }
+    public Downloader(String downloadUrl, String saveDirectory, String fileName) {
+        this(downloadUrl, saveDirectory);
+        setFileName(fileName);
     }
     //endregion
     //region public methods
@@ -214,7 +231,7 @@ public class Downloader {
         }
     }
     public void reDownload() {
-        if(state == State.Initial || state == State.Preparing || state == State.Prepared || state == State.Downloading){
+        if (state == State.Initial || state == State.Preparing || state == State.Prepared || state == State.Downloading) {
             return;
         }
         cancel(false);
@@ -409,71 +426,71 @@ public class Downloader {
         timerUpdater.schedule(timerTaskUpdater, 0, updateInterval);
         timerSpeedCalculator.schedule(timerTaskSpeedCalculator, 0, 1000);
     }
-    private void triggerOnPrepareEvent(){
+    private void triggerOnPrepareEvent() {
         if (onPrepareListener != null) {
             onPrepareListener.onPrepare();
         }
     }
-    private void triggerOnDownloadEvent(){
-        if(onDownloadListener != null){
+    private void triggerOnDownloadEvent() {
+        if (onDownloadListener != null) {
             onDownloadListener.onDownload();
         }
     }
-    private void triggerOnDoneEvent(){
-        if(onDoneListener != null){
+    private void triggerOnDoneEvent() {
+        if (onDoneListener != null) {
             onDoneListener.onDone();
         }
     }
-    private void triggerOnPauseEvent(){
+    private void triggerOnPauseEvent() {
         if (onPauseListener != null) {
             onPauseListener.onPause();
         }
     }
-    private void triggerOnCancelEvent(){
+    private void triggerOnCancelEvent() {
         if (onCancelListener != null) {
             onCancelListener.onCancel();
         }
     }
-    private void triggerOnUpdateProgressEvent(float percent){
-        if(onUpdateProgressListener != null){
+    private void triggerOnUpdateProgressEvent(float percent) {
+        if (onUpdateProgressListener != null) {
             onUpdateProgressListener.onUpdateProgress(percent, currentTotalBytes);
         }
     }
-    private void triggerOnUpdateSpeedEvent(){
+    private void triggerOnUpdateSpeedEvent() {
         if (onUpdateSpeedListener != null) {
             onUpdateSpeedListener.onUpdateSpeed(speed, estimatedTime);
         }
     }
-    private void triggerOnHttpFailEvent(){
-        if(onHttpFailListener != null){
+    private void triggerOnHttpFailEvent() {
+        if (onHttpFailListener != null) {
             onHttpFailListener.onHttpFail(httpURLConnection);
         }
     }
-    private void triggerOnExceptionEvent(Exception e){
-        if(onExceptionListener != null){
+    private void triggerOnExceptionEvent(Exception e) {
+        if (onExceptionListener != null) {
             onExceptionListener.onException(e);
         }
     }
     //endregion
     //region public static methods
-    public static void startDownloaders(Downloader[] downloaders){
-        for(Downloader downloader : downloaders){
+    public static void startDownloaders(Downloader[] downloaders) {
+        for (Downloader downloader : downloaders) {
             Downloader.downloaders.add(downloader);
             downloader.start();
         }
     }
-    public static void startAll(){
-        for(Downloader downloader : downloaders){
+    public static void startAll() {
+        for (Downloader downloader : downloaders) {
             downloader.start();
         }
     }
-    public static void pauseAll(){
-        for(Downloader downloader : downloaders){
+    public static void pauseAll() {
+        for (Downloader downloader : downloaders) {
             downloader.pause();
         }
     }
-    public static void resumeAll(){
-        for(Downloader downloader : downloaders){
+    public static void resumeAll() {
+        for (Downloader downloader : downloaders) {
             downloader.resume();
         }
     }
@@ -483,8 +500,8 @@ public class Downloader {
         }
         downloaders.clear();
     }
-    public static void reDownloadAll(){
-        for(Downloader downloader : downloaders){
+    public static void reDownloadAll() {
+        for (Downloader downloader : downloaders) {
             downloader.reDownload();
         }
     }
