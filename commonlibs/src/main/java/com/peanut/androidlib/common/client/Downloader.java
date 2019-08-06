@@ -70,6 +70,16 @@ public class Downloader {
         }
         this.saveDirectory = saveDirectory;
     }
+    private int bufferSize = 4096;
+    public int getBufferSize() {
+        return bufferSize;
+    }
+    public void setBufferSize(int bufferSize) {
+        if(bufferSize < 4096){
+            throw new IllegalArgumentException("bufferSize must be equal or bigger than 4096.");
+        }
+        this.bufferSize = bufferSize;
+    }
     private long updateInterval = 1000;
     public long getUpdateInterval() {
         return updateInterval;
@@ -128,6 +138,7 @@ public class Downloader {
     }
     //endregion
     //region private properties
+    private long rangeSize;
     private long currentTotalBytes;
     private File file;
     private FileOutputStream fileOutputStream;
@@ -159,6 +170,7 @@ public class Downloader {
         this.downloadUrl = downloadUrl;
         this.fileName = fileName;
         this.override = override;
+        rangeSize = defaultRangeRequestSize;
         singleWorker = new SingleWorker();
         downloaders.add(this);
         if (downloaders.size() > maxDownloaderCount) {
@@ -281,8 +293,8 @@ public class Downloader {
             while (state == State.Downloading) {
                 URL url = new URL(downloadUrl);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + (currentTotalBytes + defaultRangeRequestSize));
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setRequestProperty("Range", "bytes=" + currentTotalBytes + "-" + (currentTotalBytes + rangeSize));
                 if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_PARTIAL) {
                     state = State.HttpFail;
                     triggerOnHttpFailEvent();
@@ -290,7 +302,7 @@ public class Downloader {
                 } else {
                     InputStream inputStream = httpURLConnection.getInputStream();
                     DataInputStream dataInputStream = new DataInputStream(inputStream);
-                    byte[] buffer = new byte[defaultRangeRequestSize];
+                    byte[] buffer = new byte[bufferSize];
                     int length;
                     while ((length = dataInputStream.read(buffer)) > 0) {
                         fileOutputStream.write(buffer, 0, length);
@@ -322,14 +334,14 @@ public class Downloader {
         try {
             URL url = new URL(downloadUrl);
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setDoInput(true);
             if (httpURLConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 state = State.HttpFail;
                 triggerOnHttpFailEvent();
             } else {
                 InputStream inputStream = httpURLConnection.getInputStream();
                 DataInputStream dataInputStream = new DataInputStream(inputStream);
-                byte[] buffer = new byte[defaultRangeRequestSize];
+                byte[] buffer = new byte[bufferSize];
                 int length;
                 while ((length = dataInputStream.read(buffer)) > 0) {
                     fileOutputStream.write(buffer, 0, length);

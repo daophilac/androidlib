@@ -10,7 +10,7 @@
         android:id="@+id/edit_text_url"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="http://localhost:55555/api/user/testdownload"
+        android:text="http://10.0.2.2:55555/api/user/testdownload"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
