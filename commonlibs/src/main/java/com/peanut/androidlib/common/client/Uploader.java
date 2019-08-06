@@ -134,8 +134,8 @@ public class Uploader {
     private DataOutputStream dataOutputStream;
     private Timer timerUpdater;
     private Timer timerSpeedCalculator;
-    private CountDownLatch countDownLatch;
     private SingleWorker singleWorker;
+    private final Object await = new Object();
     //endregion
     //region listeners
     private OnPrepareListener onPrepareListener;
@@ -186,7 +186,9 @@ public class Uploader {
         if (state == State.Pausing) {
             state = State.Uploading;
             triggerOnUploadEvent();
-            countDownLatch.countDown();
+            synchronized (await){
+                await.notify();
+            }
         }
     }
     public void cancel() {
@@ -196,7 +198,9 @@ public class Uploader {
         } else if (state == State.Pausing) {
             state = State.Cancel;
             triggerOnCancelEvent();
-            countDownLatch.countDown();
+            synchronized (await){
+                await.notify();
+            }
         }
     }
     public void reUpload() {
@@ -276,7 +280,7 @@ public class Uploader {
     private void upload() {
         triggerOnUploadEvent();
         try {
-            fileInputStream = new FileInputStream(file); // TODO check timeout on big requests
+            fileInputStream = new FileInputStream(file);
             dataOutputStream = new DataOutputStream(httpURLConnection.getOutputStream());
             dataOutputStream.writeBytes(startingContentWrapper);
             byte[] buffer;
@@ -292,9 +296,10 @@ public class Uploader {
                 dataOutputStream.flush();
                 currentTotalBytes += bytesRead;
                 if (state == State.Pausing) {
-                    countDownLatch = new CountDownLatch(1);
                     try {
-                        countDownLatch.await();
+                        synchronized (await){
+                            await.wait();
+                        }
                         if (state == State.Uploading) {
                             runTimers();
                         } else if (state == State.Cancel || state == State.Initial) {
@@ -303,8 +308,7 @@ public class Uploader {
                             httpURLConnection.disconnect();
                             return;
                         }
-                    } catch (InterruptedException ignored) {
-                    }
+                    } catch (InterruptedException ignored) { }
                 }
                 if (state == State.Cancel) {
                     dataOutputStream.close();
