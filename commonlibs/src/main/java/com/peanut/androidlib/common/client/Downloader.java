@@ -85,9 +85,6 @@ public class Downloader {
         return fileName;
     }
     public void setFileName(String fileName) {
-        if (fileName == null) {
-            throw new IllegalArgumentException("fileName cannot be null.");
-        }
         this.fileName = fileName;
     }
     private boolean override;
