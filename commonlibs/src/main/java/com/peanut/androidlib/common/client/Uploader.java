@@ -131,7 +131,6 @@ public class Uploader {
     //endregion
     //region constructors
     public Uploader(String uploadUrl, String filePath) {
-        filePath = "/sdcard/b.zip";
         this.uploadUrl = uploadUrl;
         try {
             url = new URL(uploadUrl);
